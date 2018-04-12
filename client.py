@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 
 from socket import *
-import time, _thread
+
+"""The client just sends messages to the server."""
 
 def send_data(messages):
 	host = ('127.0.0.2', 5000)
@@ -10,13 +11,16 @@ def send_data(messages):
 
 	# Faut d'abord envoyer le nb de trames qu'on va envoyer
 	for m in messages:
+		print('Sending : ' + m)
 		s.send(m.encode())
+		answer = s.recv(2048).decode()
+		print('Answer : ' + answer)
 
 	s.close()
 
 
 if __name__ == '__main__':
-	messages = ['a 1 1, b 0 4\n', 'A 0 0, B 4 4\n', 'A DOWN', 'B UP', 'A RIGHT', 'B LEFT', 'B UP', 'A UP', 'A RIGHT', 
-	'B UP', 'B RIGHT', 'B UP', 'B LEFT', 'A RIGHT\n']
+	messages = ['#1a 1 1,c 2 3', '#2b 0 4', '#3A 0 0,B 4 4', \
+	'#4A DOWN,B UP,A RIGHT,B LEFT,B UP,A UP,A RIGHT,B UP,B RIGHT,B UP,B LEFT,A RIGHT']
 	send_data(messages)
 
