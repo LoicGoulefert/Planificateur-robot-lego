@@ -1,20 +1,43 @@
 ; It looks like this:
 ;
-; J W . X
+; J|. . X
 ; . . . .
 ; . . . .
 ; . . . .
 
-(define (problem maze3)
+(define (problem maze1)
   (:domain maze)
-  (:objects x1 x2 x3 x4 y1 y2 y3 y4 - position joseph - agent)
+  (:objects c-0-0 c-0-1 c-0-2 c-0-3
+            c-1-0 c-1-1 c-1-2 c-1-3
+            c-2-0 c-2-1 c-2-2 c-2-3
+            c-3-0 c-3-1 c-3-2 c-3-3 - cell 
+            robby - robot)
   (:init
-    (wall x2 y1)
-    (inc x1 x2) (inc x2 x3) (inc x3 x4)
-    (inc y1 y2) (inc y2 y3) (inc y3 y4)
-    (dec x4 x3) (dec x3 x2) (dec x2 x1)
-    (dec y4 y3) (dec y3 y2) (dec y2 y1)
-    (at joseph x1 y1))
+    ;; Horizontal allowed moves
+    (allowed c-0-1 c-0-2) (allowed c-0-2 c-0-3) 
+    (allowed c-1-0 c-1-1) (allowed c-1-1 c-1-2) (allowed c-1-2 c-1-3)
+    (allowed c-2-0 c-2-1) (allowed c-2-1 c-2-2) (allowed c-2-2 c-2-3)
+    (allowed c-3-0 c-3-1) (allowed c-3-1 c-3-2) (allowed c-3-2 c-3-3)
+    
+    (allowed c-0-2 c-0-1) (allowed c-0-3 c-0-2)
+    (allowed c-1-1 c-1-0) (allowed c-1-2 c-1-1) (allowed c-1-3 c-1-2)
+    (allowed c-2-1 c-2-0) (allowed c-2-2 c-2-1) (allowed c-2-3 c-2-2)
+    (allowed c-3-1 c-3-0) (allowed c-3-2 c-3-1) (allowed c-3-3 c-3-2)
+
+    ;; Vertical allowed moves
+    (allowed c-0-0 c-1-0) (allowed c-1-0 c-2-0) (allowed c-2-0 c-3-0)
+    (allowed c-0-1 c-1-1) (allowed c-1-1 c-2-1) (allowed c-2-1 c-3-1)
+    (allowed c-0-2 c-1-2) (allowed c-1-2 c-2-2) (allowed c-2-2 c-3-2)
+    (allowed c-0-3 c-1-3) (allowed c-1-3 c-2-3) (allowed c-2-3 c-3-3)
+
+    (allowed c-1-0 c-0-0) (allowed c-2-0 c-1-0) (allowed c-3-0 c-2-0)
+    (allowed c-1-1 c-0-1) (allowed c-2-1 c-1-1) (allowed c-3-1 c-2-1)
+    (allowed c-1-2 c-0-2) (allowed c-2-2 c-1-2) (allowed c-3-2 c-2-2)
+    (allowed c-1-3 c-0-3) (allowed c-2-3 c-1-3) (allowed c-3-3 c-2-3)
+
+    ;; Initial robot position
+    (at robby c-0-0))
+
   (:goal
-    (at joseph x4 y1))
+    (at robby c-0-3))
 )
