@@ -40,6 +40,7 @@ def breadth_first_search(root, goal):
     while open_set != []:
         subtree_root = open_set.pop(0)
 
+        # TODO fonction is_goal
         if is_goal(subtree_root):
             return construct_path(subtree_root, meta)
 
@@ -59,21 +60,22 @@ def breadth_first_search(root, goal):
 
             closed_set.append(subtree_root)
 
+
 def construct_path(state, meta):
     action_list = list()
 
     while True:
-    row = meta[state]
-    if len(row) == 2:
-        state = row[0]
-        action = row[1]
-        action_list.append(action)
-    else:
-        break
+        row = meta[state]
+        if len(row) == 2:
+            state = row[0]
+            action = row[1]
+            action_list.append(action)
+        else:
+            break
 
     action_list.reverse()
     return action_list
 
 
-
-
+def is_goal(node, goal):
+    return node.state == goal
