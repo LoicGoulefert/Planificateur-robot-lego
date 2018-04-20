@@ -22,8 +22,8 @@ class Node():
         for inst in ground_op_set:
             if inst.precondition_pos.issubset(self.state) \
               and inst.precondition_neg.isdisjoint(self.state):
-                new_state = (self.state.union(inst.precondition_pos)) \
-                            .difference(inst.precondition_neg)
+                new_state = (self.state.union(inst.effect_pos)) \
+                            .difference(inst.effect_neg)
                 new_node = Node(new_state, self)
                 # I still need to add the move in the action
                 action = inst.operator_name
@@ -46,7 +46,8 @@ def breadth_first_search(root, goal):
         subtree_root = open_set.pop(0)
 
         # TODO fonction is_goal
-        if is_goal(subtree_root):
+        if is_goal(subtree_root, goal):
+            print("j'ai trouvé")
             return construct_path(subtree_root, meta)
 
         for (child, action) in subtree_root.children:
@@ -63,7 +64,7 @@ def breadth_first_search(root, goal):
                 # Enqueue this node
                 open_set.append(child)
 
-            closed_set.append(subtree_root)
+            closed_set.add(subtree_root)
 
 
 def construct_path(state, meta):
@@ -83,7 +84,7 @@ def construct_path(state, meta):
 
 
 def is_goal(node, goal):
-    return node.state == goal
+    return goal in node.state
 
 
 def convert_to_tuple_set(set_of_atom):
