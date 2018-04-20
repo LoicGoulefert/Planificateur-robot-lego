@@ -7,10 +7,16 @@
 
 class Node():
     """docstring for Node"""
-    def __init__(self, state):
+    def __init__(self, state, parent):
         self.state = state
-        # faudrait la position initiale ? sans tout les allowed
         self.children = []
+        self.parent = parent
+
+    def __str__(self):
+        res = str(self.state)
+        res += "\nNumber of children : "
+        res += str(len(self.children))
+        return res
 
     def build_children(self, ground_op_set):
         for inst in ground_op_set:
@@ -18,11 +24,10 @@ class Node():
               and inst.precondition_neg.isdisjoint(self.state):
                 new_state = (self.state.union(inst.precondition_pos)) \
                             .difference(inst.precondition_neg)
-                new_node = Node(new_state)
-                # Faut rajouter l'info du move, genre c-0-1
+                new_node = Node(new_state, self)
+                # I still need to add the move in the action
                 action = inst.operator_name
-                # Ajouter l'action aussi
-                self.children.append(new_node, action)
+                self.children.append((new_node, action))
 
 
 def breadth_first_search(root, goal):
@@ -79,3 +84,10 @@ def construct_path(state, meta):
 
 def is_goal(node, goal):
     return node.state == goal
+
+
+def convert_to_tuple_set(set_of_atom):
+    s = set()
+    for atom in set_of_atom:
+        s.add(tuple(atom.predicate))
+    return s
