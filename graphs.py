@@ -6,11 +6,11 @@
 
 
 class Node():
+    all_children = set()
     """docstring for Node"""
-    def __init__(self, state, parent):
+    def __init__(self, state):
         self.state = state
         self.children = []
-        self.parent = parent
 
     def __str__(self):
         res = str(self.state)
@@ -24,10 +24,47 @@ class Node():
               and inst.precondition_neg.isdisjoint(self.state):
                 new_state = (self.state.union(inst.effect_pos)) \
                             .difference(inst.effect_neg)
-                new_node = Node(new_state, self)
-                # I still need to add the move in the action
-                action = inst.operator_name
-                self.children.append((new_node, action))
+                # appeler la f qui :
+                # si le noeud + state existe, le renvoie
+                # sinon, cree le noeud et l'enregistre dans all_children,
+                # et le renvoie
+                move_details = get_move_details(new_state)
+                action = inst.operator_name, move_details[0], move_details[1]
+                self.children.append((self.get_node_from_state(new_state),
+                                      action))
+
+    def get_node_from_state(cls, state):
+        for child in cls.all_children:
+            if child.state == state:
+                return child
+        new_child = Node(state)
+        cls.all_children.add(new_child)
+        return new_child
+
+
+def create_root(domprob):
+    seen_states = []
+    root = Node(convert_to_tuple_set(domprob.initialstate()))
+    seen_states.append(root.state)
+    op_list = list(domprob.operators())
+    build_graph(root, op_list, seen_states, domprob)
+    return root
+
+
+def build_graph(node, op_list, seen_states, domprob):
+    for op in op_list:
+        node.build_children(domprob.ground_operator(op))
+
+    # Delete nodes that we have already seen
+    # node.children = [child for child in node.children
+    #                  if child[0].state not in seen_states]
+
+    # Recursive
+    # Stops if current node has no new child
+    for child in node.children:
+        if child[0].state not in seen_states:
+            seen_states.append(child[0].state)
+            build_graph(child[0], op_list, seen_states, domprob)
 
 
 def breadth_first_search(root, goal):
@@ -40,14 +77,13 @@ def breadth_first_search(root, goal):
 
     # initialize
     open_set.append(root)
+
     meta[root] = (None, None)
 
     while open_set != []:
         subtree_root = open_set.pop(0)
 
-        # TODO fonction is_goal
         if is_goal(subtree_root, goal):
-            print("j'ai trouvé")
             return construct_path(subtree_root, meta)
 
         for (child, action) in subtree_root.children:
@@ -71,7 +107,10 @@ def construct_path(state, meta):
     action_list = list()
 
     while True:
-        row = meta[state]
+        if state is not None:
+            row = meta[state]
+        else:
+            break
         if len(row) == 2:
             state = row[0]
             action = row[1]
@@ -80,11 +119,22 @@ def construct_path(state, meta):
             break
 
     action_list.reverse()
+    action_list.pop(0)
     return action_list
 
 
+def get_move_details(state):
+    """Returns the cell coords associated
+    with the 'move' action, and the robot who
+    is making this move.
+    """
+    for s in state:
+        if s[0] == 'at':
+            return s[1], s[2]
+
+
 def is_goal(node, goal):
-    return goal in node.state
+    return goal.issubset(node.state)
 
 
 def convert_to_tuple_set(set_of_atom):

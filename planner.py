@@ -4,7 +4,11 @@
 import pddlpy
 
 # Others
-from graphs import Node, convert_to_tuple_set, breadth_first_search
+from graphs import Node, create_root
+from graphs import breadth_first_search, convert_to_tuple_set
+from client import send_data
+
+objectives_name = "abcdefghijklmnopqrstuvwxyz"
 
 
 def get_domprob(domain_path, problem_path):
@@ -24,34 +28,75 @@ def print_infos(domprob):
     print(goals)
 
 
-def create_root(domprob):
-    seen_states = []
-    root = Node(convert_to_tuple_set(domprob.initialstate()), None)
-    seen_states.append(root.state)
-    op_list = list(domprob.operators())
-    build_graph(root, op_list, seen_states, domprob)
-    return root
+def path_to_string(path):
+    """Converts the path into a string
+    for the client.
+    """
+    res = "#4"  # ID of move list
+    for action in path:
+        res += action[1]
+        coord = action[2].split('-')
+        res += " " + coord[1] + " " + coord[2]
+        res += ","
+    return res[:-1]  # [:-1] to delete the last ','
 
 
-def build_graph(node, op_list, seen_states, domprob):
-    for op in op_list:
-        node.build_children(domprob.ground_operator(op))
+def goals_to_string(goals):
+    """Converts the goals into a string
+    for the client.
+    """
+    i = 0  # index for objectives name
+    res = "#1"
+    for goal in goals:
+        coord = goal[2].split('-')
+        res += objectives_name[i] + " "
+        res += coord[1] + " " + coord[2] + ","
+        i += 1
+    return res[:-1]  # [:-1] to delete the last ','
 
-    # Delete nodes that we have already seen
-    node.children = [child for child in node.children
-                     if child[0].state not in seen_states]
 
-    # Recursive
-    # Stops if current node has no child
-    for child in node.children:
-        seen_states.append(child[0].state)
-        build_graph(child[0], op_list, seen_states, domprob)
+def robots_coord_to_string(initial_state):
+    res = "#3"
+    for state in initial_state:
+        if state[0] == 'at':
+            res += state[1] + " "
+            coord = state[2].split('-')
+            res += coord[1] + " " + coord[2]
+            res += ","
+    return res[:-1]  # [:-1] to delete the last ','
+
+
+def build_message(config_file,
+                  obj_coord, static_obj_coord,
+                  robots_coord,
+                  move_list):
+    message = []
+    message.append("#c" + config_file)
+    if obj_coord != "":
+        message.append(obj_coord)
+    if static_obj_coord != "":
+        message.append(static_obj_coord)
+    message.append(robots_coord)
+    message.append(move_list)
+    return message
 
 
 if __name__ == "__main__":
     domprob = get_domprob('pddl/domain-maze.pddl', 'pddl/problem-maze1.pddl')
-    goal = domprob.goals()
+    goal = convert_to_tuple_set(domprob.goals())
+    initial_state = convert_to_tuple_set(domprob.initialstate())
     root = create_root(domprob)
     print(root.children[0][0])
-    path = breadth_first_search(root, convert_to_tuple_set(goal))
+    path = breadth_first_search(root, goal)
+    print("Path : ")
     print(path)
+    print("Number of nodes : {}".format(len(Node.all_children)))
+
+    path_str = path_to_string(path)
+    goal_str = goals_to_string(goal)
+    robots_str = robots_coord_to_string(initial_state)
+
+    message = build_message("test.txt", goal_str, "", robots_str, path_str)
+    print(message)
+
+    send_data(message)
