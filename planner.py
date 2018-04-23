@@ -12,10 +12,12 @@ objectives_name = "abcdefghijklmnopqrstuvwxyz"
 
 
 def get_domprob(domain_path, problem_path):
+    """Returns the domain problem"""
     return pddlpy.DomainProblem(domain_path, problem_path)
 
 
 def print_infos(domprob):
+    """Debug function"""
     print("Infos :")
     print("Initial state :")
     initial_state = domprob.initialstate()
@@ -56,6 +58,9 @@ def goals_to_string(goals):
 
 
 def robots_coord_to_string(initial_state):
+    """Converts the robots coord into a string
+    for the client.
+    """
     res = "#3"
     for state in initial_state:
         if state[0] == 'at':
@@ -70,6 +75,7 @@ def build_message(config_file,
                   obj_coord, static_obj_coord,
                   robots_coord,
                   move_list):
+    """Builds the message to be sent to the simulator."""
     message = []
     message.append("#c" + config_file)
     if obj_coord != "":

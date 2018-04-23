@@ -6,8 +6,17 @@
 
 
 class Node():
+    """This class represents a node of the graph.
+    Each node is identified by its state, and can build
+    its own children depending on the different states it
+    can reach.
+
+    The class variable all_children stores the different states
+    (e.g. the different nodes) that were seen during
+    the creation of a graph.
+    """
     all_children = set()
-    """docstring for Node"""
+
     def __init__(self, state):
         self.state = state
         self.children = []
@@ -19,6 +28,13 @@ class Node():
         return res
 
     def build_children(self, ground_op_set):
+        """Builds the children of the current node.
+
+        A child is created if its state has never been seen
+        (e.g. it is not in all_children set). Otherwise, the "new"
+        child is appended to the node's children list, but is not
+        created.
+        """
         for inst in ground_op_set:
             if inst.precondition_pos.issubset(self.state) \
               and inst.precondition_neg.isdisjoint(self.state):
@@ -34,6 +50,12 @@ class Node():
                                       action))
 
     def get_node_from_state(cls, state):
+        """Returns a node representing the 'state'.
+
+        If this node already exists in the graph,
+        returns it. Else, returns a new node and
+        register it in the all_children set.
+        """
         for child in cls.all_children:
             if child.state == state:
                 return child
@@ -43,6 +65,9 @@ class Node():
 
 
 def create_root(domprob):
+    """Create the root of a graph, then
+    recursively build the graph starting from this root.
+    """
     seen_states = []
     root = Node(convert_to_tuple_set(domprob.initialstate()))
     seen_states.append(root.state)
@@ -52,6 +77,9 @@ def create_root(domprob):
 
 
 def build_graph(node, op_list, seen_states, domprob):
+    """Recursively build the node's children until
+    there are no new children created.
+    """
     for op in op_list:
         node.build_children(domprob.ground_operator(op))
 
@@ -68,6 +96,9 @@ def build_graph(node, op_list, seen_states, domprob):
 
 
 def breadth_first_search(root, goal):
+    """Breadth first search of a solution
+    in a graph. Returns a path if there is any.
+    """
     # FIFO open set
     open_set = []
     # an empty set to maintain visited nodes
@@ -104,6 +135,9 @@ def breadth_first_search(root, goal):
 
 
 def construct_path(state, meta):
+    """Builds the action list of the solution path
+    found by breadth_first_search function.
+    """
     action_list = list()
 
     while True:
@@ -134,10 +168,16 @@ def get_move_details(state):
 
 
 def is_goal(node, goal):
+    """Returns true if 'node' is a goal,
+    false otherwise.
+    """
     return goal.issubset(node.state)
 
 
 def convert_to_tuple_set(set_of_atom):
+    """Converts a set of Atom (from the pddlpy lib)
+    to a set of tuple, because we can't compare Atoms.
+    """
     s = set()
     for atom in set_of_atom:
         s.add(tuple(atom.predicate))
