@@ -19,7 +19,7 @@ class Node():
 
     def __init__(self, state):
         self.state = state
-        self.children = []
+        self.children = []  # Will store a tuple (state, action)
 
     def __str__(self):
         res = str(self.state)
@@ -162,9 +162,11 @@ def get_move_details(state):
     with the 'move' action, and the robot who
     is making this move.
     """
+    res = []
     for s in state:
         if s[0] == 'at':
-            return s[1], s[2]
+            res.append((s[1], s[2]))
+    return res
 
 
 def is_goal(node, goal):
