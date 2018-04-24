@@ -40,12 +40,10 @@ class Node():
               and inst.precondition_neg.isdisjoint(self.state):
                 new_state = (self.state.union(inst.effect_pos)) \
                             .difference(inst.effect_neg)
-                # appeler la f qui :
-                # si le noeud + state existe, le renvoie
-                # sinon, cree le noeud et l'enregistre dans all_children,
-                # et le renvoie
+
                 move_details = get_move_details(new_state)
-                action = inst.operator_name, move_details[0], move_details[1]
+                # Unpacking move_details to create tuple 'action'
+                action = (inst.operator_name, *move_details)
                 self.children.append((self.get_node_from_state(new_state),
                                       action))
 
@@ -126,7 +124,7 @@ def breadth_first_search(root, goal):
             # The child is not enqueued to be processed,
             # so enqueue this level of children to be expanded
             if child not in open_set:
-                # Faire le chemin
+                # Update the path
                 meta[child] = (subtree_root, action)
                 # Enqueue this node
                 open_set.append(child)

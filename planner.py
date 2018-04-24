@@ -31,7 +31,16 @@ def print_infos(domprob):
 
 
 if __name__ == "__main__":
+    # print("Configuration du planner : ")
+    # domain = input("Chemin du fichier domaine pddl :")
+    # problem = input("Chemin du fichier probleme pddl :")
+
+    # print("Configuration du client :")
+    # IPAdr = input("IP : ")
+    # port = int(input("Port : "))
+
     domprob = get_domprob('pddl/domain-maze.pddl', 'pddl/problem-maze1.pddl')
+    # domprob = get_domprob(domain, problem)
     goal = convert_to_tuple_set(domprob.goals())
     initial_state = convert_to_tuple_set(domprob.initialstate())
 
@@ -50,3 +59,4 @@ if __name__ == "__main__":
     print(message)
 
     send_data(message)
+    # send_data(message, IPAdr, port)
