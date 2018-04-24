@@ -34,16 +34,17 @@ if __name__ == "__main__":
     domprob = get_domprob('pddl/domain-maze.pddl', 'pddl/problem-maze1.pddl')
     goal = convert_to_tuple_set(domprob.goals())
     initial_state = convert_to_tuple_set(domprob.initialstate())
+
     root = create_root(domprob)
-    print(root.children[0][0])
     path = breadth_first_search(root, goal)
+
     print("Path : ")
     print(path)
     print("Number of nodes : {}".format(len(Node.all_children)))
 
-    path_str = path_to_string(path)
     goal_str = goals_to_string(goal)
     robots_str = robots_coord_to_string(initial_state)
+    path_str = path_to_string(path)
 
     message = build_message("test.txt", goal_str, "", robots_str, path_str)
     print(message)

@@ -25,7 +25,7 @@ def send_data(messages, IPAdr='127.0.0.2', port=5000):
 
     for m in messages:
         # Add size checking (< 2048), or maybe the planner will do this
-        print('Sending : ' + m)
+        print('Sending ({} bytes) : {} '.format(len(m), m))
         s.send(m.encode())
         answer = s.recv(2048).decode()
         print('Answer : ' + answer)
