@@ -3,7 +3,7 @@
 # Libs
 
 # Other
-
+from priorityqueue import PriorityQueue
 
 class Node():
     """This class represents a node of the graph.
@@ -20,6 +20,7 @@ class Node():
     def __init__(self, state):
         self.state = state
         self.children = []  # Will store a tuple (state, action)
+        self.priority = None  # Faut que je gere ça
 
     def __str__(self):
         res = str(self.state)
@@ -95,6 +96,45 @@ def build_graph(node, op_list, seen_states, domprob):
 
 def breadth_first_search(root, goal):
     """Breadth first search of a solution
+    in a graph. Returns a path if there is any.
+    """
+    # Priority queue
+    pqueue = PriorityQueue()
+    # an empty set to maintain visited nodes
+    closed_set = set()
+    # a dictionary for path formation
+    meta = dict()  # key -> (parent state, action to reach child)
+
+    # initialize
+    open_set.append(root)
+
+    meta[root] = (None, None)
+
+    while open_set != []:
+        subtree_root = open_set.pop(0)
+
+        if is_goal(subtree_root, goal):
+            return construct_path(subtree_root, meta)
+
+        for (child, action) in subtree_root.children:
+
+            # The node has already been processed, so skip over it
+            if child in closed_set:
+                continue
+
+            # The child is not enqueued to be processed,
+            # so enqueue this level of children to be expanded
+            if child not in open_set:
+                # Update the path
+                meta[child] = (subtree_root, action)
+                # Enqueue this node
+                open_set.append(child)
+
+            closed_set.add(subtree_root)
+
+
+def dijkstra_search(root, goal):
+    """Dijkstra search of a solution
     in a graph. Returns a path if there is any.
     """
     # FIFO open set
