@@ -39,8 +39,6 @@
     (at X c-0-0) (at Y c-1-1))
 
   (:goal
-    (and
-        (at X c-0-3) (at Y c-1-3)
-    )
+    (and (at X c-0-3) (at Y c-3-3))
   )
-
+)

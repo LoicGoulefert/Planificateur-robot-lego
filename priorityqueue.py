@@ -4,7 +4,7 @@
 
 # Other
 
-# class for Priority queue
+
 class PriorityQueue:
 
     def __init__(self):

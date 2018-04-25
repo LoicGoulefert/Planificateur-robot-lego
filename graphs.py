@@ -5,6 +5,7 @@
 # Other
 from priorityqueue import PriorityQueue
 
+
 class Node():
     """This class represents a node of the graph.
     Each node is identified by its state, and can build
@@ -64,34 +65,30 @@ class Node():
 
 
 def create_root(domprob):
-    """Create the root of a graph, then
-    recursively build the graph starting from this root.
-    """
-    seen_states = []
+    """Create the root of a graph"""
+    # seen_states = []
     root = Node(convert_to_tuple_set(domprob.initialstate()))
-    seen_states.append(root.state)
-    op_list = list(domprob.operators())
-    build_graph(root, op_list, seen_states, domprob)
+    root.priority = 0
+    # seen_states.append(root.state)
+    # op_list = list(domprob.operators())
+    # build_graph(root, op_list, seen_states, domprob)
     return root
 
 
-def build_graph(node, op_list, seen_states, domprob):
-    """Recursively build the node's children until
-    there are no new children created.
-    """
-    for op in op_list:
-        node.build_children(domprob.ground_operator(op))
+# SHOULD BE OBSOLETE NOW
+# def build_graph(node, op_list, seen_states, domprob):
+#     """Recursively build the node's children until
+#     there are no new children created.
+#     """
+#     for op in op_list:
+#         node.build_children(domprob.ground_operator(op))
 
-    # Delete nodes that we have already seen
-    # node.children = [child for child in node.children
-    #                  if child[0].state not in seen_states]
-
-    # Recursive
-    # Stops if current node has no new child
-    for child in node.children:
-        if child[0].state not in seen_states:
-            seen_states.append(child[0].state)
-            build_graph(child[0], op_list, seen_states, domprob)
+#     # Recursive
+#     # Stops if current node has no new child
+#     for child in node.children:
+#         if child[0].state not in seen_states:
+#             seen_states.append(child[0].state)
+#             build_graph(child[0], op_list, seen_states, domprob)
 
 
 def breadth_first_search(root, goal):
@@ -133,7 +130,7 @@ def breadth_first_search(root, goal):
             closed_set.add(subtree_root)
 
 
-def dijkstra_search(root, goal):
+def dijkstra_search(root, goal, op_list, domprob):
     """Dijkstra search of a solution
     in a graph. Returns a path if there is any.
     """
@@ -145,7 +142,6 @@ def dijkstra_search(root, goal):
     meta = dict()  # key -> (parent state, action to reach child)
 
     # initialize
-    root.priority = 0
     pqueue.insert(root)
 
     meta[root] = (None, None)
@@ -156,6 +152,10 @@ def dijkstra_search(root, goal):
 
         if is_goal(subtree_root, goal):
             return construct_path(subtree_root, meta)
+
+        # Create current node's children
+        for op in op_list:
+            subtree_root.build_children(domprob.ground_operator(op))
 
         for (child, action) in subtree_root.children:
 
