@@ -133,8 +133,12 @@ def breadth_first_search(root, goal):
 def dijkstra_search(root, goal, op_list, domprob):
     """Dijkstra search of a solution
     in a graph. Returns a path if there is any.
+
+    The priority of each node represent the cost
+    (if each edge weights 1) to go from the root
+    to the node.
     """
-    # FIFO open set
+    # Priority queue
     pqueue = PriorityQueue()
     # an empty set to maintain visited nodes
     closed_set = set()
@@ -146,7 +150,7 @@ def dijkstra_search(root, goal, op_list, domprob):
 
     meta[root] = (None, None)
 
-    while pqueue.queue != []:
+    while not pqueue.empty():
         subtree_root = pqueue.dequeue()
         current_priority = subtree_root.priority
 

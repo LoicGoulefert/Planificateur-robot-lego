@@ -2,6 +2,7 @@
 
 # Libs
 import pddlpy
+from time import time
 
 # Others
 from graphs import Node, create_root, dijkstra_search
@@ -38,19 +39,27 @@ if __name__ == "__main__":
     # print("Configuration du client :")
     # IPAdr = input("IP : ")
     # port = int(input("Port : "))
-
-    domprob = get_domprob('pddl/domain-maze.pddl', 'pddl/problem-maze3.pddl')
+    maze_pb = int(input("Quel fichier de probleme ? (1, 2 ou 3) :"))
+    if maze_pb == 3:
+        file = "m1.txt"
+    else:
+        file = "test.txt"
+    domprob = get_domprob('pddl/domain-maze.pddl', 'pddl/problem-maze{}.pddl'.format(maze_pb))
     # domprob = get_domprob(domain, problem)
     goal = convert_to_tuple_set(domprob.goals())
     initial_state = convert_to_tuple_set(domprob.initialstate())
     op_list = list(domprob.operators())
 
     root = create_root(domprob)
+
+    t0 = time()
     path = dijkstra_search(root, goal, op_list, domprob)
+    t1 = time()
+    print("dijkstra_search : {}s".format(t1 - t0))
 
     print("Path : ")
     print(path)
-    print("Number of nodes : {}".format(len(Node.all_children)))
+    print("Number of nodes explored: {}".format(len(Node.all_children)))
 
     if path is None:
         print("No path found.")
@@ -59,8 +68,7 @@ if __name__ == "__main__":
         robots_str = robots_coord_to_string(initial_state)
         path_str = path_to_string(path)
 
-        message = build_message("m1.txt", goal_str, "", robots_str, path_str)
-        print(message)
+        message = build_message(file, goal_str, "", robots_str, path_str)
 
         send_data(message)
         # send_data(message, IPAdr, port)

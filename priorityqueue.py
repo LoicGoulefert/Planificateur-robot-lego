@@ -36,3 +36,6 @@ class PriorityQueue:
 
     def size(self):
         return len(self.queue)
+
+    def empty(self):
+        return self.size() == 0
