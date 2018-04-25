@@ -146,7 +146,7 @@ def dijkstra_search(root, goal, op_list, domprob):
 
     meta[root] = (None, None)
 
-    while pqueue != []:
+    while pqueue.queue != []:
         subtree_root = pqueue.dequeue()
         current_priority = subtree_root.priority
 

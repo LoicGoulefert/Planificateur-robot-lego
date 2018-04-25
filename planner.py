@@ -39,7 +39,7 @@ if __name__ == "__main__":
     # IPAdr = input("IP : ")
     # port = int(input("Port : "))
 
-    domprob = get_domprob('pddl/domain-maze.pddl', 'pddl/problem-maze1.pddl')
+    domprob = get_domprob('pddl/domain-maze.pddl', 'pddl/problem-maze3.pddl')
     # domprob = get_domprob(domain, problem)
     goal = convert_to_tuple_set(domprob.goals())
     initial_state = convert_to_tuple_set(domprob.initialstate())
@@ -52,12 +52,15 @@ if __name__ == "__main__":
     print(path)
     print("Number of nodes : {}".format(len(Node.all_children)))
 
-    goal_str = goals_to_string(goal)
-    robots_str = robots_coord_to_string(initial_state)
-    path_str = path_to_string(path)
+    if path is None:
+        print("No path found.")
+    else:
+        goal_str = goals_to_string(goal)
+        robots_str = robots_coord_to_string(initial_state)
+        path_str = path_to_string(path)
 
-    message = build_message("test.txt", goal_str, "", robots_str, path_str)
-    print(message)
+        message = build_message("m1.txt", goal_str, "", robots_str, path_str)
+        print(message)
 
-    send_data(message)
-    # send_data(message, IPAdr, port)
+        send_data(message)
+        # send_data(message, IPAdr, port)
