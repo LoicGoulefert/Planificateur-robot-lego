@@ -4,7 +4,7 @@
 import pddlpy
 
 # Others
-from graphs import Node, create_root
+from graphs import Node, create_root, dijkstra_search
 from graphs import breadth_first_search, convert_to_tuple_set
 from client import send_data
 from parser import path_to_string, goals_to_string
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     initial_state = convert_to_tuple_set(domprob.initialstate())
 
     root = create_root(domprob)
-    path = breadth_first_search(root, goal)
+    path = dijkstra_search(root, goal)
 
     print("Path : ")
     print(path)

@@ -98,8 +98,8 @@ def breadth_first_search(root, goal):
     """Breadth first search of a solution
     in a graph. Returns a path if there is any.
     """
-    # Priority queue
-    pqueue = PriorityQueue()
+    # FIFO open set
+    open_set = []
     # an empty set to maintain visited nodes
     closed_set = set()
     # a dictionary for path formation
@@ -138,19 +138,21 @@ def dijkstra_search(root, goal):
     in a graph. Returns a path if there is any.
     """
     # FIFO open set
-    open_set = []
+    pqueue = PriorityQueue()
     # an empty set to maintain visited nodes
     closed_set = set()
     # a dictionary for path formation
     meta = dict()  # key -> (parent state, action to reach child)
 
     # initialize
-    open_set.append(root)
+    root.priority = 0
+    pqueue.insert(root)
 
     meta[root] = (None, None)
 
-    while open_set != []:
-        subtree_root = open_set.pop(0)
+    while pqueue != []:
+        subtree_root = pqueue.dequeue()
+        current_priority = subtree_root.priority
 
         if is_goal(subtree_root, goal):
             return construct_path(subtree_root, meta)
@@ -163,11 +165,13 @@ def dijkstra_search(root, goal):
 
             # The child is not enqueued to be processed,
             # so enqueue this level of children to be expanded
-            if child not in open_set:
+            if child not in pqueue.queue:
+                # Set priority level of the child
+                child.priority = current_priority + 1
                 # Update the path
                 meta[child] = (subtree_root, action)
                 # Enqueue this node
-                open_set.append(child)
+                pqueue.insert(child)
 
             closed_set.add(subtree_root)
 
