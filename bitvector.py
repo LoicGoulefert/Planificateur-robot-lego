@@ -12,10 +12,28 @@ All functions in this module will get informations from
 the pddlpy lib and convert those into sets of bitvectors.
 """
 
-# Me faut une fonction qui converti un elem d'état
-# en bitvector.
-# Du coup il me faut des infos sur la taille du labyrinthe...? => et oui
-# nb_cells, nb_robots
+
+class GroundOpBV():
+    """This object will replace the objects
+    returned by domprob.ground_op(op).
+    """
+    def __init__(self, instance, nb_robots, width, height):
+        self.precondition_pos = convert_to_bv(instance.precondition_pos,
+                                              nb_robots,
+                                              width,
+                                              height)
+        self.precondition_neg = convert_to_bv(instance.precondition_neg,
+                                              nb_robots,
+                                              width,
+                                              height)
+        self.effect_pos = convert_to_bv(instance.effect_pos,
+                                        nb_robots,
+                                        width,
+                                        height)
+        self.effect_neg = convert_to_bv(instance.effect_neg,
+                                        nb_robots,
+                                        width,
+                                        height)
 
 
 def get_coord_from_cell(cell):
@@ -33,15 +51,14 @@ def get_index_of_cell(cell, width):
     return x*width + y
 
 
-def get_initial_state(initial_state, nb_robots, width, height):
-    """
-    """
+def convert_to_bv(state, nb_robots, width, height):
+    """Converts a PDDL state into a bit-vector"""
     robots_seen = 0  # Keeps track of the number of robots seen
     nb_cells = width * height
     offset = nb_cells * nb_robots  # To skip the 'header' of the BV
     init_state_bv = BitVector(size=offset + nb_cells*nb_cells)
 
-    for s in initial_state:
+    for s in state:
         if s[0] == 'at':
             x, y = get_coord_from_cell(s[2])
             index = (width*x + y) + robots_seen*nb_cells
@@ -56,9 +73,14 @@ def get_initial_state(initial_state, nb_robots, width, height):
     return init_state_bv
 
 
-def get_ground_operator(domprob, nb_robots, nb_cells):
-    # ground_op_bv = BitVector(size=nb_cells*nb_robots + nb_cells*nb_cells)
-    pass
+def get_ground_operator(ground_op, nb_robots, width, height):
+    """Converts a ground_operator set into
+    a set of GroundOpBV.
+    """
+    ground_op_bv = set()
+    for inst in ground_op:
+        ground_op_bv.add(GroundOpBV(inst, nb_robots, width, height))
+    return ground_op_bv
 
 
 if __name__ == '__main__':

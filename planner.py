@@ -10,7 +10,7 @@ from graphs import convert_to_tuple_set  # , breadth_first_search
 from client import send_data
 from parser import path_to_string, goals_to_string
 from parser import robots_coord_to_string, build_message
-from bitvector import get_initial_state
+from bitvector import convert_to_bv
 
 
 def get_domprob(domain_path, problem_path):
@@ -78,10 +78,16 @@ def main():
     # Test BV
     nb_robots = get_nb_robots(initial_state)
     width, height = get_width_and_height(problem_file)
-    init_bv = get_initial_state(initial_state, nb_robots, width, height)
-    print(init_bv[:16])
-    print(init_bv[16:32])
+    init_bv = convert_to_bv(initial_state, nb_robots, width, height)
+    goal_bv = convert_to_bv(goal, nb_robots, width, height)
+
+    print("Taille init_bv : {}".format(len(init_bv)))
+    print(init_bv[:width*height])
     print(init_bv)
+
+    print("Taille goal_bv : {}".format(len(goal_bv)))
+    print(goal_bv[:width*height])
+    print(goal_bv)
 
     input()
 

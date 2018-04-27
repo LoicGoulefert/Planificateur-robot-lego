@@ -43,8 +43,10 @@ class Node():
         # print(len(list(ground_op_set)))
         # input()
         for inst in ground_op_set:
+            print(inst.effect_pos)
+            input()
             if inst.precondition_pos.issubset(self.state) \
-              and inst.precondition_neg.isdisjoint(self.state):
+               and inst.precondition_neg.isdisjoint(self.state):
                 # Creating new state
                 new_state = (self.state.union(inst.effect_pos)) \
                             .difference(inst.effect_neg)
