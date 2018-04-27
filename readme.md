@@ -10,5 +10,6 @@ The final objective is to implement the A* algorithm to search the state graph, 
 pip3 install antlr-python2-runtime
 pip3 install antlr-python3-runtime
 pip3 install pddlpy
+pip3 install BitVector
 ```
 
