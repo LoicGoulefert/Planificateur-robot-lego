@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 
 # Libs
-
+# from time import time
 # Other
 from priorityqueue import PriorityQueue
 
@@ -21,7 +21,7 @@ class Node():
     def __init__(self, state):
         self.state = state
         self.children = []  # Will store a tuple (state, action)
-        self.priority = None  # Faut que je gere ça
+        self.priority = None  # Priority used in Dijkstra search
 
     def __str__(self):
         res = str(self.state)
@@ -36,16 +36,23 @@ class Node():
         (e.g. it is not in all_children set). Otherwise, the "new"
         child is appended to the node's children list, but is not
         created.
+
+        The 'ground_op_set' parameter is a set of all possible actions
+        per operator.
         """
+        # print(len(list(ground_op_set)))
+        # input()
         for inst in ground_op_set:
             if inst.precondition_pos.issubset(self.state) \
               and inst.precondition_neg.isdisjoint(self.state):
+                # Creating new state
                 new_state = (self.state.union(inst.effect_pos)) \
                             .difference(inst.effect_neg)
-
+                # t2 = time()
                 move_details = get_move_details(new_state)
                 # Unpacking move_details to create tuple 'action'
                 action = (inst.operator_name, *move_details)
+                # t3 = time()
                 self.children.append((self.get_node_from_state(new_state),
                                       action))
 
@@ -64,34 +71,14 @@ class Node():
         return new_child
 
 
-def create_root(domprob):
+def create_root(initial_state):
     """Create the root of a graph"""
-    # seen_states = []
-    root = Node(convert_to_tuple_set(domprob.initialstate()))
+    root = Node(initial_state)
     root.priority = 0
-    # seen_states.append(root.state)
-    # op_list = list(domprob.operators())
-    # build_graph(root, op_list, seen_states, domprob)
     return root
 
 
-# SHOULD BE OBSOLETE NOW
-# def build_graph(node, op_list, seen_states, domprob):
-#     """Recursively build the node's children until
-#     there are no new children created.
-#     """
-#     for op in op_list:
-#         node.build_children(domprob.ground_operator(op))
-
-#     # Recursive
-#     # Stops if current node has no new child
-#     for child in node.children:
-#         if child[0].state not in seen_states:
-#             seen_states.append(child[0].state)
-#             build_graph(child[0], op_list, seen_states, domprob)
-
-
-def breadth_first_search(root, goal):
+def breadth_first_search(root, goal, op_list, domprob):
     """Breadth first search of a solution
     in a graph. Returns a path if there is any.
     """
@@ -112,6 +99,10 @@ def breadth_first_search(root, goal):
 
         if is_goal(subtree_root, goal):
             return construct_path(subtree_root, meta)
+
+        # Create current node's children
+        for op in op_list:
+            subtree_root.build_children(domprob.ground_operator(op))
 
         for (child, action) in subtree_root.children:
 

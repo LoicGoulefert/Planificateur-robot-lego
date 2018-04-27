@@ -6,10 +6,11 @@ from time import time
 
 # Others
 from graphs import Node, create_root, dijkstra_search
-from graphs import convert_to_tuple_set
+from graphs import convert_to_tuple_set  # , breadth_first_search
 from client import send_data
 from parser import path_to_string, goals_to_string
 from parser import robots_coord_to_string, build_message
+from bitvector import get_initial_state
 
 
 def get_domprob(domain_path, problem_path):
@@ -31,7 +32,30 @@ def print_infos(domprob):
     print(goals)
 
 
-if __name__ == "__main__":
+def get_nb_robots(initial_state):
+    """Returns the number of robots in the maze.
+    This function is specific to maze planning problems.
+    """
+    res = 0
+    for s in initial_state:
+        if s[0] == 'at':
+            res += 1
+    return res
+
+
+def get_width_and_height(pddl_problem_file):
+    """Returns the width and height of the maze.
+    This function is specific to maze planning problems.
+    """
+    with open(pddl_problem_file) as f:
+        first_line = f.readline()
+        second_line = f.readline()
+        width = int(first_line.strip('; \n'))
+        height = int(second_line.strip('; \n'))
+        return width, height
+
+
+def main():
     # print("Configuration du planner : ")
     # domain = input("Chemin du fichier domaine pddl :")
     # problem = input("Chemin du fichier probleme pddl :")
@@ -44,13 +68,24 @@ if __name__ == "__main__":
         file = "m1.txt"
     else:
         file = "test.txt"
-    domprob = get_domprob('pddl/domain-maze.pddl', 'pddl/problem-maze{}.pddl'.format(maze_pb))
+    problem_file = 'pddl/problem-maze{}.pddl'.format(maze_pb)
+    domprob = get_domprob('pddl/domain-maze.pddl', problem_file)
     # domprob = get_domprob(domain, problem)
     goal = convert_to_tuple_set(domprob.goals())
     initial_state = convert_to_tuple_set(domprob.initialstate())
     op_list = list(domprob.operators())
 
-    root = create_root(domprob)
+    # Test BV
+    nb_robots = get_nb_robots(initial_state)
+    width, height = get_width_and_height(problem_file)
+    init_bv = get_initial_state(initial_state, nb_robots, width, height)
+    print(init_bv[:16])
+    print(init_bv[16:32])
+    print(init_bv)
+
+    input()
+
+    root = create_root(initial_state)
 
     t0 = time()
     path = dijkstra_search(root, goal, op_list, domprob)
@@ -72,3 +107,6 @@ if __name__ == "__main__":
 
         send_data(message)
         # send_data(message, IPAdr, port)
+
+if __name__ == "__main__":
+    main()
