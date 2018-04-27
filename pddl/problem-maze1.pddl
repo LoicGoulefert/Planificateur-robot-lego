@@ -1,4 +1,5 @@
-; 16
+; 4
+; 4
 ; It looks like this:
 ;
 ; J|. . X
