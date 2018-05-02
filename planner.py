@@ -73,7 +73,6 @@ def main():
     # domprob = get_domprob(domain, problem)
     goal = convert_to_tuple_set(domprob.goals())
     initial_state = convert_to_tuple_set(domprob.initialstate())
-    op_list = list(domprob.operators())
 
     # Test BV
     nb_robots = get_nb_robots(initial_state)
@@ -89,12 +88,12 @@ def main():
     print(goal_bv[:width*height])
     print(goal_bv)
 
-    input()
+    # input()
 
-    root = create_root(initial_state)
+    root = create_root(init_bv)
 
     t0 = time()
-    path = dijkstra_search(root, goal, op_list, domprob)
+    path = dijkstra_search(root, goal_bv, domprob, nb_robots, width, height)
     t1 = time()
     print("dijkstra_search : {}s".format(t1 - t0))
 

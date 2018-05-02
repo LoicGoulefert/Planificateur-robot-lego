@@ -4,6 +4,8 @@
 # from time import time
 # Other
 from priorityqueue import PriorityQueue
+from BitVector import BitVector
+from bitvector import get_ground_operator
 
 
 class Node():
@@ -40,23 +42,31 @@ class Node():
         The 'ground_op_set' parameter is a set of all possible actions
         per operator.
         """
-        # print(len(list(ground_op_set)))
-        # input()
         for inst in ground_op_set:
-            print(inst.effect_pos)
-            input()
-            if inst.precondition_pos.issubset(self.state) \
-               and inst.precondition_neg.isdisjoint(self.state):
+            # print("precond_pos=", inst.precondition_pos)
+            # print("state=", self.state)
+            # print("res precond_pos & state=", inst.precondition_pos & self.state)
+            # print("neg=", inst.precondition_neg)
+            # print("res neg ^ state=", inst.precondition_neg ^ self.state)
+            zero_bv = BitVector(size=len(inst.precondition_pos))
+            # print("and => ", (inst.precondition_pos & self.state) == inst.precondition_pos)
+            # print("xor => ", ~(inst.precondition_neg & self.state) == ~zero_bv)
+            # print("~zero => ", ~zero_bv)
+            # print("\n")
+            #input()
+            if (inst.precondition_pos & self.state) == inst.precondition_pos \
+               and ~(inst.precondition_neg & self.state) == ~zero_bv:
                 # Creating new state
-                new_state = (self.state.union(inst.effect_pos)) \
-                            .difference(inst.effect_neg)
+                new_state = (self.state | inst.effect_pos) & (~inst.effect_neg)
                 # t2 = time()
-                move_details = get_move_details(new_state)
-                # Unpacking move_details to create tuple 'action'
-                action = (inst.operator_name, *move_details)
+                header = new_state[:inst.width * inst.height * inst.nb_robots]
+                move_details = header | zero_bv
+                action = (inst.operator_name, move_details)
                 # t3 = time()
                 self.children.append((self.get_node_from_state(new_state),
                                       action))
+                # print(move_details)
+                # input()
 
     def get_node_from_state(cls, state):
         """Returns a node representing the 'state'.
@@ -123,9 +133,9 @@ def breadth_first_search(root, goal, op_list, domprob):
             closed_set.add(subtree_root)
 
 
-def dijkstra_search(root, goal, op_list, domprob):
-    """Dijkstra search of a solution
-    in a graph. Returns a path if there is any.
+def dijkstra_search(root, goal, domprob, nb_robots, width, height):
+    """Dijkstra search of a solution in a graph.
+    Returns a path if there is any.
 
     The priority of each node represent the cost
     (if each edge weights 1) to go from the root
@@ -137,11 +147,14 @@ def dijkstra_search(root, goal, op_list, domprob):
     closed_set = set()
     # a dictionary for path formation
     meta = dict()  # key -> (parent state, action to reach child)
+    # Operator list
+    op_list = list(domprob.operators())
 
     # initialize
     pqueue.insert(root)
 
     meta[root] = (None, None)
+    ground_op_bv = get_ground_operator(op_list, domprob, nb_robots, width, height)
 
     while not pqueue.empty():
         subtree_root = pqueue.dequeue()
@@ -151,8 +164,8 @@ def dijkstra_search(root, goal, op_list, domprob):
             return construct_path(subtree_root, meta)
 
         # Create current node's children
-        for op in op_list:
-            subtree_root.build_children(domprob.ground_operator(op))
+        for op in ground_op_bv:
+            subtree_root.build_children(op)
 
         for (child, action) in subtree_root.children:
 
@@ -196,23 +209,11 @@ def construct_path(state, meta):
     return action_list
 
 
-def get_move_details(state):
-    """Returns the cell coords associated
-    with the 'move' action, and the robot who
-    is making this move.
-    """
-    res = []
-    for s in state:
-        if s[0] == 'at':
-            res.append((s[1], s[2]))
-    return res
-
-
 def is_goal(node, goal):
     """Returns true if 'node' is a goal,
     false otherwise.
     """
-    return goal.issubset(node.state)
+    return goal & node.state == goal
 
 
 def convert_to_tuple_set(set_of_atom):
