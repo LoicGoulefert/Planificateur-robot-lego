@@ -81,7 +81,7 @@ def main():
     goal_bv = convert_to_bv(goal, nb_robots, width, height)
 
     print("Taille init_bv : {}".format(len(init_bv)))
-    print(init_bv[:width*height])
+    print(init_bv[:width*height+8])
     print(init_bv)
 
     # input()

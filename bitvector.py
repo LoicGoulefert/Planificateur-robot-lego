@@ -114,8 +114,11 @@ def get_ground_operator(op_list, domprob, nb_robots, width, height):
 # Debug
 def translate_header(header, nb_robots, nb_cells):
     for i in range(nb_robots):
-        robot_name = chr(int(header[i*(nb_cells+8):i*(nb_cells+8)+8]))
-        print("Robot {}".format(robot_name))
+        begin = i*(nb_cells+8)
+        end = i*(nb_cells+8)+8
+        robot_name = chr(int(header[begin:end]))
+        at = header[end:end+nb_cells]
+        print("Robot {} at {}".format(robot_name, at))
 
 
 if __name__ == '__main__':
