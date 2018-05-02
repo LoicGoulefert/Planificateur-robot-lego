@@ -58,37 +58,45 @@ def get_index_of_cell(cell, width):
 def convert_to_bv(state, nb_robots, width, height):
     """Converts a PDDL state into a bit-vector
 
-    If a state has x robots, then the (number of cells) * x
-    first bits represent the robots position.
+    If a state has x robots, then the (number of cells + 8) * x
+    first bits represent the robot's name and position.
     The next (number of cells)² bits are all of the 'allowed'
     preconditions possible for a state, with a value of 1 if a precondition
     is actually True in the pddl-style state.
 
     +---+---+
     | X |   |
-    +---+---+  => 1  0  0  0   0 1 1 0 0 1 0 0 1 1 0 0 1 0 1 1 0
-    |   |   |      X coords         'allowed' preconditions
+    +---+---+ => 0 1 0 1 1 0 0 0  1  0  0  0  0 1 1 0 0 1 0 0 1 1 0 0 1 0 1 1 0
+    |   |   |     encoding 'X'     X coords         'allowed' preconditions
     +---+---+
 
     """
     robots_seen = 0  # Keeps track of the number of robots seen
     nb_cells = width * height
-    offset = nb_cells * nb_robots  # To skip the 'header' of the BV
-    init_state_bv = BitVector(size=offset + nb_cells*nb_cells)
+    offset = (nb_cells+8) * (nb_robots)  # To skip the 'header' of the BV
+    state_bv = BitVector(size=offset + nb_cells*nb_cells)
 
     for s in state:
         if s[0] == 'at':
             x, y = get_coord_from_cell(s[2])
-            index = (width*x + y) + robots_seen*nb_cells
-            init_state_bv[index] = 1
+            # Writing robot's name
+            begin = robots_seen * (nb_cells+8)
+            state_bv[begin:begin+8] = BitVector(intVal=ord(s[1]), size=8)
+            # Writing robot's position
+            index = (width*x + y) + robots_seen*(nb_cells+8) + 8
+            state_bv[index] = 1
             robots_seen += 1
         else:
             c1 = get_index_of_cell(s[1], width)
             c2 = get_index_of_cell(s[2], width)
             index = c1*nb_cells + c2 + offset
-            init_state_bv[index] = 1
+            state_bv[index] = 1
 
-    return init_state_bv
+    # print(state_bv[:offset])
+    # print(state_bv)
+    # translate_header(state_bv[:offset], nb_robots, nb_cells)
+    # input()
+    return state_bv
 
 
 def get_ground_operator(op_list, domprob, nb_robots, width, height):
@@ -101,6 +109,13 @@ def get_ground_operator(op_list, domprob, nb_robots, width, height):
             ground_op_bv.add(GroundOpBV(inst, nb_robots, width, height))
         res.append(ground_op_bv)
     return res
+
+
+# Debug
+def translate_header(header, nb_robots, nb_cells):
+    for i in range(nb_robots):
+        robot_name = chr(int(header[i*(nb_cells+8):i*(nb_cells+8)+8]))
+        print("Robot {}".format(robot_name))
 
 
 if __name__ == '__main__':

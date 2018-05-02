@@ -84,10 +84,6 @@ def main():
     print(init_bv[:width*height])
     print(init_bv)
 
-    print("Taille goal_bv : {}".format(len(goal_bv)))
-    print(goal_bv[:width*height])
-    print(goal_bv)
-
     # input()
 
     root = create_root(init_bv)
@@ -100,6 +96,7 @@ def main():
     print("Path : ")
     print(path)
     print("Number of nodes explored: {}".format(len(Node.all_children)))
+    input()
 
     if path is None:
         print("No path found.")

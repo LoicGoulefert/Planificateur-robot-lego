@@ -43,21 +43,20 @@ class Node():
         per operator.
         """
         for inst in ground_op_set:
-            # print("precond_pos=", inst.precondition_pos)
-            # print("state=", self.state)
-            # print("res precond_pos & state=", inst.precondition_pos & self.state)
-            # print("neg=", inst.precondition_neg)
-            # print("res neg ^ state=", inst.precondition_neg ^ self.state)
             zero_bv = BitVector(size=len(inst.precondition_pos))
-            # print("and => ", (inst.precondition_pos & self.state) == inst.precondition_pos)
-            # print("xor => ", ~(inst.precondition_neg & self.state) == ~zero_bv)
-            # print("~zero => ", ~zero_bv)
-            # print("\n")
-            #input()
+
+            # if PP.issubset(state) AND PN.isdisjoint(state)
             if (inst.precondition_pos & self.state) == inst.precondition_pos \
-               and ~(inst.precondition_neg & self.state) == ~zero_bv:
+               and (inst.precondition_neg & self.state) == zero_bv:
                 # Creating new state
+                # new_state = (self.state.union(inst.effect_pos)) \
+                # .difference(inst.effect_neg)
                 new_state = (self.state | inst.effect_pos) & (~inst.effect_neg)
+                print("state =", self.state)
+                print("effect_pos =", inst.effect_pos)
+                print("effect_neg =", inst.effect_neg)
+                print("new_state =", new_state)
+                input()
                 # t2 = time()
                 header = new_state[:inst.width * inst.height * inst.nb_robots]
                 move_details = header | zero_bv
@@ -65,8 +64,6 @@ class Node():
                 # t3 = time()
                 self.children.append((self.get_node_from_state(new_state),
                                       action))
-                # print(move_details)
-                # input()
 
     def get_node_from_state(cls, state):
         """Returns a node representing the 'state'.
@@ -168,6 +165,7 @@ def dijkstra_search(root, goal, domprob, nb_robots, width, height):
             subtree_root.build_children(op)
 
         for (child, action) in subtree_root.children:
+            # print("action=", action)
 
             # The node has already been processed, so skip over it
             if child in closed_set:

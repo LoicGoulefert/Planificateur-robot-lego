@@ -3,9 +3,9 @@
 ; It looks like this:
 ;
 ;  +---+---+
-;  | X |   |
+;  | X | Y |
 ;  +---+---+
-;  |   | a |
+;  | b | a |
 ;  +---+---+
 ;
 
@@ -13,7 +13,7 @@
   (:domain maze)
   (:objects c-0-0 c-0-1
             c-1-0 c-1-1 - cell
-            X - robot)
+            X Y - robot)
   (:init
     ;; Horizontal allowed moves
     (allowed c-0-0 c-0-1)
@@ -30,9 +30,9 @@
     (allowed c-1-1 c-0-1)
 
     ;; Initial robot position
-    (at X c-0-0))
+    (at X c-0-0) (at Y c-0-1))
 
   (:goal
-    (at X c-1-1)
+    (and (at X c-1-1) (at Y c-1-0))
   )
 )
