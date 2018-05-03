@@ -10,7 +10,7 @@ from graphs import convert_to_tuple_set  # , breadth_first_search
 from client import send_data
 from parser import path_to_string, goals_to_string
 from parser import robots_coord_to_string, build_message
-from bitvector import convert_to_bv
+from bitvector import convert_to_bv, set_robot_list
 
 
 def get_domprob(domain_path, problem_path):
@@ -74,17 +74,18 @@ def main():
     goal = convert_to_tuple_set(domprob.goals())
     initial_state = convert_to_tuple_set(domprob.initialstate())
 
-    # Test BV
+    # ********************Test BV********************************
     nb_robots = get_nb_robots(initial_state)
     width, height = get_width_and_height(problem_file)
+    set_robot_list(initial_state)
     init_bv = convert_to_bv(initial_state, nb_robots, width, height)
     goal_bv = convert_to_bv(goal, nb_robots, width, height)
 
     print("Taille init_bv : {}".format(len(init_bv)))
-    print(init_bv[:width*height+8])
+    print(init_bv[:width*height])
     print(init_bv)
 
-    # input()
+    # ***********************************************************
 
     root = create_root(init_bv)
 
@@ -101,6 +102,7 @@ def main():
     if path is None:
         print("No path found.")
     else:
+        # Sending path to simulator
         goal_str = goals_to_string(goal)
         robots_str = robots_coord_to_string(initial_state)
         path_str = path_to_string(path)

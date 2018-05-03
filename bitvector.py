@@ -12,11 +12,15 @@ All functions in this module will get informations from
 the pddlpy lib and convert those into sets of bitvectors.
 """
 
+# Store the robots in alphabetical order
+robot_list = list()
+
 
 class GroundOpBV():
     """This object will replace the objects
     returned by domprob.ground_op(op).
     """
+
     def __init__(self, instance, nb_robots, width, height):
         self.precondition_pos = convert_to_bv(instance.precondition_pos,
                                               nb_robots,
@@ -38,6 +42,14 @@ class GroundOpBV():
         self.width = width
         self.height = height
         self.operator_name = instance.operator_name
+
+
+def set_robot_list(state):
+    """Build the global variable robot_list, and sort it."""
+    for s in state:
+        if s[0] == 'at':
+            robot_list.append(s[1])
+    robot_list.sort()
 
 
 def get_coord_from_cell(cell):
@@ -66,27 +78,24 @@ def convert_to_bv(state, nb_robots, width, height):
 
     +---+---+
     | X |   |
-    +---+---+ => 0 1 0 1 1 0 0 0  1  0  0  0  0 1 1 0 0 1 0 0 1 1 0 0 1 0 1 1 0
-    |   |   |     encoding 'X'     X coords         'allowed' preconditions
+    +---+---+ =>   1  0  0  0   0 1 1 0 0 1 0 0 1 1 0 0 1 0 1 1 0
+    |   |   |       X coords         'allowed' preconditions
     +---+---+
 
     """
-    robots_seen = 0  # Keeps track of the number of robots seen
     nb_cells = width * height
-    offset = (nb_cells+8) * (nb_robots)  # To skip the 'header' of the BV
+    offset = nb_cells * (nb_robots)  # To skip the 'header' of the BV
     state_bv = BitVector(size=offset + nb_cells*nb_cells)
 
     for s in state:
         if s[0] == 'at':
+            # Encoding 'at' states in bitvector
             x, y = get_coord_from_cell(s[2])
-            # Writing robot's name
-            begin = robots_seen * (nb_cells+8)
-            state_bv[begin:begin+8] = BitVector(intVal=ord(s[1]), size=8)
-            # Writing robot's position
-            index = (width*x + y) + robots_seen*(nb_cells+8) + 8
+            bot_index = robot_list.index(s[1])
+            index = (width*x + y) + bot_index*nb_cells
             state_bv[index] = 1
-            robots_seen += 1
         else:
+            # Encoding 'allowed' states in bitvector
             c1 = get_index_of_cell(s[1], width)
             c2 = get_index_of_cell(s[2], width)
             index = c1*nb_cells + c2 + offset
