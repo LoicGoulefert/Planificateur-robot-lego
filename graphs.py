@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 
 # Libs
-from time import time
+# from time import time
 # Other
 from priorityqueue import PriorityQueue
 from BitVector import BitVector
@@ -45,19 +45,20 @@ class Node():
         for inst in ground_op_set:
             zero_bv = BitVector(size=len(inst.precondition_pos))
             # if PP.issubset(state) AND PN.isdisjoint(state)
-            t0 = time()
+            # t0 = time()
             if (inst.precondition_pos & self.state) == inst.precondition_pos \
                and (inst.precondition_neg & self.state) == zero_bv:
-                print("if : {:.4e}".format(time() - t0))
+                # print("if : {:.4e}".format(time() - t0))
                 # Creating new state
                 # new_state = (self.state.union(inst.effect_pos)) \
                 # .difference(inst.effect_neg)
-                t1 = time()
+                # t1 = time()
                 new_state = (self.state | inst.effect_pos) & (~inst.effect_neg)
-                print(" new_state : {:.4e}".format(time() - t1))
+                # print(" new_state : {:.4e}".format(time() - t1))
                 # t2 = time()
-                header = new_state[:inst.width * inst.height * inst.nb_robots]
-                move_details = header | zero_bv
+                header_size = inst.width * inst.height * inst.nb_robots
+                header = new_state[:header_size]
+                move_details = (header | zero_bv) << len(zero_bv) - header_size
                 action = (inst.operator_name, move_details)
                 # t3 = time()
                 self.children.append((self.get_node_from_state(new_state),

@@ -43,6 +43,15 @@ def get_nb_robots(initial_state):
     return res
 
 
+def get_robot_list(initial_state):
+    res = list()
+    for s in initial_state:
+        if s[0] == 'at':
+            res.append(s[1])
+    res.sort()
+    return res
+
+
 def get_width_and_height(pddl_problem_file):
     """Returns the width and height of the maze.
     This function is specific to maze planning problems.
@@ -81,10 +90,6 @@ def main():
     init_bv = convert_to_bv(initial_state, nb_robots, width, height)
     goal_bv = convert_to_bv(goal, nb_robots, width, height)
 
-    print("Taille init_bv : {}".format(len(init_bv)))
-    print(init_bv[:width*height])
-    print(init_bv)
-
     # ***********************************************************
 
     root = create_root(init_bv)
@@ -93,11 +98,7 @@ def main():
     path = dijkstra_search(root, goal_bv, domprob, nb_robots, width, height)
     t1 = time()
     print("dijkstra_search : {}s".format(t1 - t0))
-
-    print("Path : ")
-    print(path)
     print("Number of nodes explored: {}".format(len(Node.all_children)))
-    input()
 
     if path is None:
         print("No path found.")
@@ -105,7 +106,8 @@ def main():
         # Sending path to simulator
         goal_str = goals_to_string(goal)
         robots_str = robots_coord_to_string(initial_state)
-        path_str = path_to_string(path)
+        path_str = path_to_string(
+            path, get_robot_list(initial_state), width*height, width)
 
         message = build_message(file, goal_str, "", robots_str, path_str)
 
