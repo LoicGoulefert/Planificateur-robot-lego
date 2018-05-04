@@ -4,7 +4,7 @@
 # from time import time
 # Other
 from priorityqueue import PriorityQueue
-from BitVector import BitVector
+from bitarray import bitarray
 from bitvector import get_ground_operator
 
 
@@ -43,24 +43,21 @@ class Node():
         per operator.
         """
         for inst in ground_op_set:
-            zero_bv = BitVector(size=len(inst.precondition_pos))
+            length = len(inst.precondition_pos)
+            zero_bv = bitarray(length)
+            zero_bv.setall(0)
             # if PP.issubset(state) AND PN.isdisjoint(state)
-            # t0 = time()
             if (inst.precondition_pos & self.state) == inst.precondition_pos \
                and (inst.precondition_neg & self.state) == zero_bv:
-                # print("if : {:.4e}".format(time() - t0))
-                # Creating new state
                 # new_state = (self.state.union(inst.effect_pos)) \
                 # .difference(inst.effect_neg)
-                # t1 = time()
                 new_state = (self.state | inst.effect_pos) & (~inst.effect_neg)
-                # print(" new_state : {:.4e}".format(time() - t1))
-                # t2 = time()
                 header_size = inst.width * inst.height * inst.nb_robots
-                header = new_state[:header_size]
-                move_details = (header | zero_bv) << len(zero_bv) - header_size
+                padding = bitarray(length - header_size)
+                padding.setall(0)
+                move_details = new_state[:header_size]
+                move_details.extend(padding)
                 action = (inst.operator_name, move_details)
-                # t3 = time()
                 self.children.append((self.get_node_from_state(new_state),
                                       action))
 

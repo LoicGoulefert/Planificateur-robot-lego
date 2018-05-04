@@ -89,6 +89,8 @@ def main():
     set_robot_list(initial_state)
     init_bv = convert_to_bv(initial_state, nb_robots, width, height)
     goal_bv = convert_to_bv(goal, nb_robots, width, height)
+    print("Init bitvector : ", init_bv)
+    print("Goal : ", goal_bv)
 
     # ***********************************************************
 

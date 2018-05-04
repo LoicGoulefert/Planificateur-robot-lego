@@ -3,7 +3,7 @@
 # Libs
 
 # Others
-from BitVector import BitVector
+from bitarray import bitarray
 
 """This module is an interface between the pddlpy lib
 and a bitvector representation of states.
@@ -85,7 +85,8 @@ def convert_to_bv(state, nb_robots, width, height):
     """
     nb_cells = width * height
     offset = nb_cells * (nb_robots)  # To skip the 'header' of the BV
-    state_bv = BitVector(size=offset + nb_cells*nb_cells)
+    state_bv = bitarray(offset + nb_cells*nb_cells)
+    state_bv.setall(0)
 
     for s in state:
         if s[0] == 'at':
