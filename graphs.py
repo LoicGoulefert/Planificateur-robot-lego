@@ -45,7 +45,7 @@ class Node():
         for inst in ground_op_set:
             length = len(inst.precondition_pos)
             zero_bv = bitarray(length)
-            zero_bv.setall(0)
+            zero_bv.setall(False)
             # if PP.issubset(state) AND PN.isdisjoint(state)
             if (inst.precondition_pos & self.state) == inst.precondition_pos \
                and (inst.precondition_neg & self.state) == zero_bv:
@@ -54,7 +54,7 @@ class Node():
                 new_state = (self.state | inst.effect_pos) & (~inst.effect_neg)
                 header_size = inst.width * inst.height * inst.nb_robots
                 padding = bitarray(length - header_size)
-                padding.setall(0)
+                padding.setall(False)
                 move_details = new_state[:header_size]
                 move_details.extend(padding)
                 action = (inst.operator_name, move_details)
