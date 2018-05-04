@@ -17,8 +17,8 @@ robot_list = list()
 
 
 class GroundOpBV():
-    """This object will replace the objects
-    returned by domprob.ground_op(op).
+    """This object will replace the objects returned
+    by domprob.ground_op(op).
     """
 
     def __init__(self, instance, nb_robots, width, height):
@@ -102,16 +102,12 @@ def convert_to_bv(state, nb_robots, width, height):
             index = c1*nb_cells + c2 + offset
             state_bv[index] = 1
 
-    # print(state_bv[:offset])
-    # print(state_bv)
-    # translate_header(state_bv[:offset], nb_robots, nb_cells)
-    # input()
     return state_bv
 
 
 def get_ground_operator(op_list, domprob, nb_robots, width, height):
     """Converts a ground_operator set into a set of GroundOpBV."""
-    res = list()
+    res = list()  # A list of sets of GroundOpBV
     for op in op_list:
         ground_op_bv = set()
         ground_op = domprob.ground_operator(op)
@@ -119,17 +115,6 @@ def get_ground_operator(op_list, domprob, nb_robots, width, height):
             ground_op_bv.add(GroundOpBV(inst, nb_robots, width, height))
         res.append(ground_op_bv)
     return res
-
-
-# Debug
-def translate_header(header, nb_robots, nb_cells):
-    for i in range(nb_robots):
-        begin = i*(nb_cells+8)
-        end = i*(nb_cells+8)+8
-        robot_name = chr(int(header[begin:end]))
-        at = header[end:end+nb_cells]
-        print("Robot {} at {}".format(robot_name, at))
-
 
 if __name__ == '__main__':
     pass

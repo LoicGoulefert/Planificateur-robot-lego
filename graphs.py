@@ -46,17 +46,17 @@ class Node():
             length = len(inst.precondition_pos)
             zero_bv = bitarray(length)
             zero_bv.setall(False)
-            # if PP.issubset(state) AND PN.isdisjoint(state)
             if (inst.precondition_pos & self.state) == inst.precondition_pos \
                and (inst.precondition_neg & self.state) == zero_bv:
-                # new_state = (self.state.union(inst.effect_pos)) \
-                # .difference(inst.effect_neg)
+                # Create new state
                 new_state = (self.state | inst.effect_pos) & (~inst.effect_neg)
+                # Extract move details
                 header_size = inst.width * inst.height * inst.nb_robots
                 padding = bitarray(length - header_size)
                 padding.setall(False)
                 move_details = new_state[:header_size]
                 move_details.extend(padding)
+
                 action = (inst.operator_name, move_details)
                 self.children.append((self.get_node_from_state(new_state),
                                       action))
@@ -77,53 +77,53 @@ class Node():
 
 
 def create_root(initial_state):
-    """Create the root of a graph"""
+    """Create the root of a graph."""
     root = Node(initial_state)
     root.priority = 0
     return root
 
+# Obsolete
+# def breadth_first_search(root, goal, op_list, domprob):
+#     """Breadth first search of a solution
+#     in a graph. Returns a path if there is any.
+#     """
+#     # FIFO open set
+#     open_set = []
+#     # an empty set to maintain visited nodes
+#     closed_set = set()
+#     # a dictionary for path formation
+#     meta = dict()  # key -> (parent state, action to reach child)
 
-def breadth_first_search(root, goal, op_list, domprob):
-    """Breadth first search of a solution
-    in a graph. Returns a path if there is any.
-    """
-    # FIFO open set
-    open_set = []
-    # an empty set to maintain visited nodes
-    closed_set = set()
-    # a dictionary for path formation
-    meta = dict()  # key -> (parent state, action to reach child)
+#     # initialize
+#     open_set.append(root)
 
-    # initialize
-    open_set.append(root)
+#     meta[root] = (None, None)
 
-    meta[root] = (None, None)
+#     while open_set != []:
+#         subtree_root = open_set.pop(0)
 
-    while open_set != []:
-        subtree_root = open_set.pop(0)
+#         if is_goal(subtree_root, goal):
+#             return construct_path(subtree_root, meta)
 
-        if is_goal(subtree_root, goal):
-            return construct_path(subtree_root, meta)
+#         # Create current node's children
+#         for op in op_list:
+#             subtree_root.build_children(domprob.ground_operator(op))
 
-        # Create current node's children
-        for op in op_list:
-            subtree_root.build_children(domprob.ground_operator(op))
+#         for (child, action) in subtree_root.children:
 
-        for (child, action) in subtree_root.children:
+#             # The node has already been processed, so skip over it
+#             if child in closed_set:
+#                 continue
 
-            # The node has already been processed, so skip over it
-            if child in closed_set:
-                continue
+#             # The child is not enqueued to be processed,
+#             # so enqueue this level of children to be expanded
+#             if child not in open_set:
+#                 # Update the path
+#                 meta[child] = (subtree_root, action)
+#                 # Enqueue this node
+#                 open_set.append(child)
 
-            # The child is not enqueued to be processed,
-            # so enqueue this level of children to be expanded
-            if child not in open_set:
-                # Update the path
-                meta[child] = (subtree_root, action)
-                # Enqueue this node
-                open_set.append(child)
-
-            closed_set.add(subtree_root)
+#             closed_set.add(subtree_root)
 
 
 def dijkstra_search(root, goal, domprob, nb_robots, width, height):
@@ -131,7 +131,7 @@ def dijkstra_search(root, goal, domprob, nb_robots, width, height):
     Returns a path if there is any.
 
     The priority of each node represent the cost
-    (if each edge weights 1) to go from the root
+    (if each action costs 1) to go from the root
     to the node.
     """
     # Priority queue
@@ -162,8 +162,6 @@ def dijkstra_search(root, goal, domprob, nb_robots, width, height):
             subtree_root.build_children(op)
 
         for (child, action) in subtree_root.children:
-            # print("action=", action)
-
             # The node has already been processed, so skip over it
             if child in closed_set:
                 continue
@@ -171,7 +169,6 @@ def dijkstra_search(root, goal, domprob, nb_robots, width, height):
             # The child is not enqueued to be processed,
             # so enqueue this level of children to be expanded
             if child not in pqueue.queue:
-                # Set priority level of the child
                 child.priority = current_priority + 1
                 # Update the path
                 meta[child] = (subtree_root, action)
@@ -182,9 +179,7 @@ def dijkstra_search(root, goal, domprob, nb_robots, width, height):
 
 
 def construct_path(state, meta):
-    """Builds the action list of the solution path
-    found by breadth_first_search function.
-    """
+    """Builds the action list of a solution path."""
     action_list = list()
 
     while True:
@@ -205,9 +200,7 @@ def construct_path(state, meta):
 
 
 def is_goal(node, goal):
-    """Returns true if 'node' is a goal,
-    false otherwise.
-    """
+    """Returns true if 'node' is a goal, false otherwise."""
     return goal & node.state == goal
 
 

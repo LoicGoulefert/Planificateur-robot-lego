@@ -18,20 +18,6 @@ def get_domprob(domain_path, problem_path):
     return pddlpy.DomainProblem(domain_path, problem_path)
 
 
-def print_infos(domprob):
-    """Debug function"""
-    print("Infos :")
-    print("Initial state :")
-    initial_state = domprob.initialstate()
-    print(initial_state)
-    print("Operators list :")
-    op_list = list(domprob.operators())
-    print(op_list)
-    print("Goals :")
-    goals = domprob.goals()
-    print(goals)
-
-
 def get_nb_robots(initial_state):
     """Returns the number of robots in the maze.
     This function is specific to maze planning problems.
@@ -44,6 +30,9 @@ def get_nb_robots(initial_state):
 
 
 def get_robot_list(initial_state):
+    """Returns a list containing the names of the robots,
+    sorted alphabetically.
+    """
     res = list()
     for s in initial_state:
         if s[0] == 'at':
@@ -64,14 +53,22 @@ def get_width_and_height(pddl_problem_file):
         return width, height
 
 
-def main():
-    # print("Configuration du planner : ")
-    # domain = input("Chemin du fichier domaine pddl :")
-    # problem = input("Chemin du fichier probleme pddl :")
+def configure_planner():
+    """Returns the domain and problem files, and the
+    configuration (ip and port) for the client.
+    """
+    print("Configuration du planner : ")
+    domain = input("Chemin du fichier domaine pddl :")
+    problem = input("Chemin du fichier probleme pddl :")
 
-    # print("Configuration du client :")
-    # IPAdr = input("IP : ")
-    # port = int(input("Port : "))
+    print("Configuration du client :")
+    IPAdr = input("IP : ")
+    port = int(input("Port : "))
+    return domain, problem, IPAdr, port
+
+
+def main():
+    # domain, problem, IPAdr, port = configure_planner()
     maze_pb = int(input("Quel fichier de probleme ? (1, 2 ou 3) :"))
     if maze_pb == 3:
         file = "m1.txt"
@@ -79,7 +76,6 @@ def main():
         file = "test.txt"
     problem_file = 'pddl/problem-maze{}.pddl'.format(maze_pb)
     domprob = get_domprob('pddl/domain-maze.pddl', problem_file)
-    # domprob = get_domprob(domain, problem)
     goal = convert_to_tuple_set(domprob.goals())
     initial_state = convert_to_tuple_set(domprob.initialstate())
 
@@ -89,8 +85,6 @@ def main():
     set_robot_list(initial_state)
     init_bv = convert_to_bv(initial_state, nb_robots, width, height)
     goal_bv = convert_to_bv(goal, nb_robots, width, height)
-    print("Init bitvector : ", init_bv)
-    print("Goal : ", goal_bv)
 
     # ***********************************************************
 
@@ -110,9 +104,7 @@ def main():
         robots_str = robots_coord_to_string(initial_state)
         path_str = path_to_string(
             path, get_robot_list(initial_state), width*height, width)
-
         message = build_message(file, goal_str, "", robots_str, path_str)
-
         send_data(message)
         # send_data(message, IPAdr, port)
 

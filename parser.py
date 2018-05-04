@@ -19,9 +19,7 @@ def goals_to_string(goals):
 
 
 def robots_coord_to_string(initial_state):
-    """Converts the robots coord into a string
-    for the client.
-    """
+    """Converts the robots coord into a string for the client."""
     res = "#3"
     for state in initial_state:
         if state[0] == 'at':
@@ -32,21 +30,8 @@ def robots_coord_to_string(initial_state):
     return res[:-1]  # [:-1] to delete the last ','
 
 
-# def path_to_string(path):
-#     """Converts the path into a string
-#     for the client.
-#     """
-#     res = "#4"  # ID of move list
-#     for action in path:  # (move, (x, cell), (y, cell))
-#         for a in action[1:]:
-#             res += a[0]
-#             coord = a[1].split('-')
-#             res += " " + coord[1] + " " + coord[2]
-#             res += ","
-#     return res[:-1]  # [:-1] to delete the last ','
-
 def path_to_string(path, robot_list, nb_cells, width):
-    """Converts the path into a string for the client."""
+    """Converts the path of bitstring into a string for the client."""
     res = "#4"  # ID of move list
     for action in path:  # bitvector
         header = action[1][:nb_cells * len(robot_list)]
@@ -67,7 +52,7 @@ def path_to_string(path, robot_list, nb_cells, width):
 
 def split_into_chunks(message):
     """Splits a string bigger than CHUNK_SIZE
-    into smaller chunks of CHUNK_SIZE size maximum.
+    into smaller chunks of CHUNK_SIZE length maximum.
     """
     packet_id = message[:2]
     res = []

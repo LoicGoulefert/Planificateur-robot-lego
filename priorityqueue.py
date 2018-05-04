@@ -6,11 +6,13 @@
 
 
 class PriorityQueue:
-
+    """Implementation of a priority queue."""
     def __init__(self):
         self.queue = list()
 
     def insert(self, node):
+        """Insert a node into the priority queue,
+        so that it still is ordered after the insertion."""
         # if queue is empty
         if self.size() == 0:
             # add the new node
@@ -31,11 +33,13 @@ class PriorityQueue:
                     return True
 
     def dequeue(self):
-        # remove the first node from the queue
+        """Remove the first node from the queue."""
         return self.queue.pop(0)
 
     def size(self):
+        """Returns the size of the queue."""
         return len(self.queue)
 
     def empty(self):
+        """Returns true if the queue is empty, false otherwise."""
         return self.size() == 0
