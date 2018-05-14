@@ -105,16 +105,21 @@ def convert_to_bv(state, nb_robots, width, height):
     return state_bv
 
 
-def get_ground_operator(op_list, domprob, nb_robots, width, height):
+def get_ground_operator(op_list, domprob, init, nb_robots, width, height):
     """Converts a ground_operator set into a set of GroundOpBV."""
     res = list()  # A list of sets of GroundOpBV
+    header_size = nb_robots * width * height
     for op in op_list:
         ground_op_bv = set()
         ground_op = domprob.ground_operator(op)
         for inst in ground_op:
-            ground_op_bv.add(GroundOpBV(inst, nb_robots, width, height))
+            gov = GroundOpBV(inst, nb_robots, width, height)
+            if (gov.precondition_pos[header_size:] | init[header_size:]) \
+               == init[header_size:]:
+                ground_op_bv.add(gov)
         res.append(ground_op_bv)
     return res
+
 
 if __name__ == '__main__':
     pass

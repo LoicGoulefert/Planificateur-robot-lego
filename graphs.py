@@ -6,6 +6,7 @@
 from priorityqueue import PriorityQueue
 from bitarray import bitarray
 from bitvector import get_ground_operator
+import sys
 
 
 class Node():
@@ -83,7 +84,7 @@ def create_root(initial_state):
     return root
 
 
-def dijkstra_search(root, goal, domprob, nb_robots, width, height):
+def dijkstra_search(root, goal, init, domprob, nb_robots, width, height):
     """Dijkstra search of a solution in a graph.
     Returns a path if there is any.
 
@@ -105,7 +106,7 @@ def dijkstra_search(root, goal, domprob, nb_robots, width, height):
 
     meta[root] = (None, None)
     ground_op_bv = get_ground_operator(
-        op_list, domprob, nb_robots, width, height)
+        op_list, domprob, init, nb_robots, width, height)
     print("Taille de ground_op : {}".format(len(ground_op_bv[0])))
 
     while not pqueue.empty():
@@ -136,7 +137,7 @@ def dijkstra_search(root, goal, domprob, nb_robots, width, height):
             closed_set.add(subtree_root)
 
 
-def a_star_search(root, goal, domprob, nb_robots, width, height):
+def a_star_search(root, goal, init, domprob, nb_robots, width, height):
     """A* search of a solution in a graph.
     Returns a path if there is any.
 
@@ -158,8 +159,10 @@ def a_star_search(root, goal, domprob, nb_robots, width, height):
 
     meta[root] = (None, None)
     ground_op_bv = get_ground_operator(
-        op_list, domprob, nb_robots, width, height)
+        op_list, domprob, init, nb_robots, width, height)
     print("Taille de ground_op : {}".format(len(ground_op_bv[0])))
+    # for opbv in ground_op_bv[0]:
+    #     print(opbv.precondition_pos)
 
     while not pqueue.empty():
         subtree_root = pqueue.dequeue()
@@ -228,11 +231,11 @@ def convert_to_tuple_set(set_of_atom):
 
 
 def graphplan_heuristic(state, ground_op_bv, goal, depth, seen_list):
+    length = len(state)
+    zero_bv = bitarray(length)
+    zero_bv.setall(False)
     for op in ground_op_bv:
         for inst in op:
-            length = len(inst.precondition_pos)
-            zero_bv = bitarray(length)
-            zero_bv.setall(False)
             # Check if the action is valid
             if (inst.precondition_pos & state) == inst.precondition_pos \
                and (inst.precondition_neg & state) == zero_bv:
@@ -247,4 +250,4 @@ def graphplan_heuristic(state, ground_op_bv, goal, depth, seen_list):
                         return graphplan_heuristic(
                             new_state, ground_op_bv, goal, depth, seen_list)
 
-    return 0
+    return sys.maxsize

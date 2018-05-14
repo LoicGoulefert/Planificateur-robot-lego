@@ -12,6 +12,14 @@ from parser import path_to_string, goals_to_string
 from parser import robots_coord_to_string, build_message
 from bitvector import convert_to_bv, set_robot_list
 
+"""How it works :
+1) Config of pddl files + IP, port
+2) Get info from pddl files
+3) Convert these into bitvectors
+4) Search for a solution in state graph
+5) Parse solution to send it to the simulator
+"""
+
 
 def get_domprob(domain_path, problem_path):
     """Returns the domain problem"""
@@ -90,13 +98,15 @@ def main():
 
     root = create_root(init_bv)
 
-    t0 = time()
-    path = dijkstra_search(root, goal_bv, domprob, nb_robots, width, height)
-    t1 = time()
-    print("dijkstra_search : {}s".format(t1 - t0))
+    # t0 = time()
+    # path = dijkstra_search(
+    #    root, goal_bv, init_bv, domprob, nb_robots, width, height)
+    # t1 = time()
+    # print("dijkstra_search : {}s".format(t1 - t0))
 
     t0 = time()
-    path = a_star_search(root, goal_bv, domprob, nb_robots, width, height)
+    path = a_star_search(
+        root, goal_bv, init_bv, domprob, nb_robots, width, height)
     t1 = time()
     print("a_star_search : {}s".format(t1 - t0))
     print("Number of nodes explored (A*): {}".format(len(Node.all_children)))
