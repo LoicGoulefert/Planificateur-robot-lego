@@ -82,49 +82,6 @@ def create_root(initial_state):
     root.priority = 0
     return root
 
-# Obsolete
-# def breadth_first_search(root, goal, op_list, domprob):
-#     """Breadth first search of a solution
-#     in a graph. Returns a path if there is any.
-#     """
-#     # FIFO open set
-#     open_set = []
-#     # an empty set to maintain visited nodes
-#     closed_set = set()
-#     # a dictionary for path formation
-#     meta = dict()  # key -> (parent state, action to reach child)
-
-#     # initialize
-#     open_set.append(root)
-
-#     meta[root] = (None, None)
-
-#     while open_set != []:
-#         subtree_root = open_set.pop(0)
-
-#         if is_goal(subtree_root, goal):
-#             return construct_path(subtree_root, meta)
-
-#         # Create current node's children
-#         for op in op_list:
-#             subtree_root.build_children(domprob.ground_operator(op))
-
-#         for (child, action) in subtree_root.children:
-
-#             # The node has already been processed, so skip over it
-#             if child in closed_set:
-#                 continue
-
-#             # The child is not enqueued to be processed,
-#             # so enqueue this level of children to be expanded
-#             if child not in open_set:
-#                 # Update the path
-#                 meta[child] = (subtree_root, action)
-#                 # Enqueue this node
-#                 open_set.append(child)
-
-#             closed_set.add(subtree_root)
-
 
 def dijkstra_search(root, goal, domprob, nb_robots, width, height):
     """Dijkstra search of a solution in a graph.
@@ -149,6 +106,7 @@ def dijkstra_search(root, goal, domprob, nb_robots, width, height):
     meta[root] = (None, None)
     ground_op_bv = get_ground_operator(
         op_list, domprob, nb_robots, width, height)
+    print("Taille de ground_op : {}".format(len(ground_op_bv[0])))
 
     while not pqueue.empty():
         subtree_root = pqueue.dequeue()
@@ -170,6 +128,61 @@ def dijkstra_search(root, goal, domprob, nb_robots, width, height):
             # so enqueue this level of children to be expanded
             if child not in pqueue.queue:
                 child.priority = current_priority + 1
+                # Update the path
+                meta[child] = (subtree_root, action)
+                # Enqueue this node
+                pqueue.insert(child)
+
+            closed_set.add(subtree_root)
+
+
+def a_star_search(root, goal, domprob, nb_robots, width, height):
+    """A* search of a solution in a graph.
+    Returns a path if there is any.
+
+    The priority of each node represent the cost
+    (if each action costs 1) to go from the root
+    to the node + the heuristic function value at current node.
+    """
+    # Priority queue
+    pqueue = PriorityQueue()
+    # an empty set to maintain visited nodes
+    closed_set = set()
+    # a dictionary for path formation
+    meta = dict()  # key -> (parent state, action to reach child)
+    # Operator list
+    op_list = list(domprob.operators())
+
+    # initialize
+    pqueue.insert(root)
+
+    meta[root] = (None, None)
+    ground_op_bv = get_ground_operator(
+        op_list, domprob, nb_robots, width, height)
+    print("Taille de ground_op : {}".format(len(ground_op_bv[0])))
+
+    while not pqueue.empty():
+        subtree_root = pqueue.dequeue()
+        current_priority = subtree_root.priority
+
+        if is_goal(subtree_root, goal):
+            return construct_path(subtree_root, meta)
+
+        # Create current node's children
+        for op in ground_op_bv:
+            subtree_root.build_children(op)
+
+        for (child, action) in subtree_root.children:
+            # The node has already been processed, so skip over it
+            if child in closed_set:
+                continue
+
+            # The child is not enqueued to be processed,
+            # so enqueue this level of children to be expanded
+            if child not in pqueue.queue:
+                h = graphplan_heuristic(child.state, ground_op_bv, goal, 0, [])
+                # print("A* : h = {}".format(h))
+                child.priority = current_priority + 1 + h
                 # Update the path
                 meta[child] = (subtree_root, action)
                 # Enqueue this node
@@ -212,3 +225,26 @@ def convert_to_tuple_set(set_of_atom):
     for atom in set_of_atom:
         s.add(tuple(atom.predicate))
     return s
+
+
+def graphplan_heuristic(state, ground_op_bv, goal, depth, seen_list):
+    for op in ground_op_bv:
+        for inst in op:
+            length = len(inst.precondition_pos)
+            zero_bv = bitarray(length)
+            zero_bv.setall(False)
+            # Check if the action is valid
+            if (inst.precondition_pos & state) == inst.precondition_pos \
+               and (inst.precondition_neg & state) == zero_bv:
+                depth += 1
+                # Create a new state with a valid action
+                new_state = (state | inst.effect_pos) & (~inst.effect_neg)
+                if new_state not in seen_list:
+                    seen_list.append(new_state)
+                    if goal & new_state == goal:
+                        return depth
+                    else:
+                        return graphplan_heuristic(
+                            new_state, ground_op_bv, goal, depth, seen_list)
+
+    return 0

@@ -5,7 +5,7 @@ import pddlpy
 from time import time
 
 # Others
-from graphs import Node, create_root, dijkstra_search
+from graphs import Node, create_root, dijkstra_search, a_star_search
 from graphs import convert_to_tuple_set  # , breadth_first_search
 from client import send_data
 from parser import path_to_string, goals_to_string
@@ -94,7 +94,12 @@ def main():
     path = dijkstra_search(root, goal_bv, domprob, nb_robots, width, height)
     t1 = time()
     print("dijkstra_search : {}s".format(t1 - t0))
-    print("Number of nodes explored: {}".format(len(Node.all_children)))
+
+    t0 = time()
+    path = a_star_search(root, goal_bv, domprob, nb_robots, width, height)
+    t1 = time()
+    print("a_star_search : {}s".format(t1 - t0))
+    print("Number of nodes explored (A*): {}".format(len(Node.all_children)))
 
     if path is None:
         print("No path found.")
