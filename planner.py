@@ -77,8 +77,8 @@ def configure_planner():
 
 def main():
     # domain, problem, IPAdr, port = configure_planner()
-    maze_pb = int(input("Quel fichier de probleme ? (1, 2 ou 3) :"))
-    if maze_pb == 3:
+    maze_pb = int(input("Quel fichier de probleme ? (0,1,2,3 ou 4) :"))
+    if maze_pb == 3 or maze_pb == 4:
         file = "m1.txt"
     else:
         file = "test.txt"
@@ -98,17 +98,17 @@ def main():
 
     root = create_root(init_bv)
 
-    # t0 = time()
-    # path = dijkstra_search(
-    #    root, goal_bv, init_bv, domprob, nb_robots, width, height)
-    # t1 = time()
-    # print("dijkstra_search : {}s".format(t1 - t0))
-
     t0 = time()
-    path = a_star_search(
-        root, goal_bv, init_bv, domprob, nb_robots, width, height)
+    path = dijkstra_search(
+       root, goal_bv, init_bv, domprob, nb_robots, width, height)
     t1 = time()
-    print("a_star_search : {}s".format(t1 - t0))
+    print("dijkstra_search : {}s".format(t1 - t0))
+
+    # t0 = time()
+    # path = a_star_search(
+    #     root, goal_bv, init_bv, domprob, nb_robots, width, height)
+    # t1 = time()
+    # print("a_star_search : {}s".format(t1 - t0))
     print("Number of nodes explored (A*): {}".format(len(Node.all_children)))
 
     if path is None:

@@ -45,7 +45,12 @@ class GroundOpBV():
 
 
 def set_robot_list(state):
-    """Build the global variable robot_list, and sort it."""
+    """Build the global variable robot_list, and sort it.
+
+    Parameter:
+        state: a pddl-like tuple of string
+                ex : ('at', 'X', 'c-0-0')
+    """
     for s in state:
         if s[0] == 'at':
             robot_list.append(s[1])
@@ -55,6 +60,10 @@ def set_robot_list(state):
 def get_coord_from_cell(cell):
     """From a string representing a cell in pddl format,
     returns the x and y coordinates.
+
+    Parameter:
+        cell: a string representing a cell.
+              ex : 'c-0-0'
     """
     coord = cell.split('-')
     x, y = int(coord[1]), int(coord[2])
@@ -62,7 +71,12 @@ def get_coord_from_cell(cell):
 
 
 def get_index_of_cell(cell, width):
-    """Returns the position of a cell in the maze"""
+    """Returns the position of a cell in the maze.
+
+    Parameters:
+        cell: a string representing a cell ('c-0-0')
+        width: an integer, the width of the maze
+    """
     x, y = get_coord_from_cell(cell)
     return x*width + y
 
@@ -82,6 +96,11 @@ def convert_to_bv(state, nb_robots, width, height):
     |   |   |       X coords         'allowed' preconditions
     +---+---+
 
+    Parameters:
+        state: a pddl-like tuple of string
+        nb_robots: integer, number of robots on the maze
+        width: integer, width of the maze
+        height: integer, height of the maze
     """
     nb_cells = width * height
     offset = nb_cells * (nb_robots)  # To skip the 'header' of the BV
@@ -106,17 +125,29 @@ def convert_to_bv(state, nb_robots, width, height):
 
 
 def get_ground_operator(op_list, domprob, init, nb_robots, width, height):
-    """Converts a ground_operator set into a set of GroundOpBV."""
+    """Converts a ground_operator set into a list of sets of GroundOpBV.
+    Remove impossible operators (those whose preconditions
+    will never be true).
+
+    Parameters:
+        op_list: string list, names of all operators
+        domprob: Domain-Problem object from pddlpy lib
+        init: bitvector representing the initial state of the maze
+              + its preconditions ('allowed' and 'at')
+        nb_robots: integer, number of robots in the maze
+        width, height: integers, dimensions of the maze
+    """
     res = list()  # A list of sets of GroundOpBV
     header_size = nb_robots * width * height
     for op in op_list:
         ground_op_bv = set()
         ground_op = domprob.ground_operator(op)
         for inst in ground_op:
-            gov = GroundOpBV(inst, nb_robots, width, height)
-            if (gov.precondition_pos[header_size:] | init[header_size:]) \
+            gobv = GroundOpBV(inst, nb_robots, width, height)
+            # Adding possible action
+            if (gobv.precondition_pos[header_size:] | init[header_size:]) \
                == init[header_size:]:
-                ground_op_bv.add(gov)
+                ground_op_bv.add(gobv)
         res.append(ground_op_bv)
     return res
 

@@ -40,13 +40,13 @@ class Node():
         child is appended to the node's children list, but is not
         created.
 
-        The 'ground_op_set' parameter is a set of all possible actions
-        per operator.
+        Parameter:
+            ground_op_set: set of all possible actions per operator.
         """
+        length = len(self.state)
+        zero_bv = bitarray(length)
+        zero_bv.setall(False)
         for inst in ground_op_set:
-            length = len(inst.precondition_pos)
-            zero_bv = bitarray(length)
-            zero_bv.setall(False)
             if (inst.precondition_pos & self.state) == inst.precondition_pos \
                and (inst.precondition_neg & self.state) == zero_bv:
                 # Create new state
@@ -57,7 +57,6 @@ class Node():
                 padding.setall(False)
                 move_details = new_state[:header_size]
                 move_details.extend(padding)
-
                 action = (inst.operator_name, move_details)
                 self.children.append((self.get_node_from_state(new_state),
                                       action))
@@ -68,6 +67,9 @@ class Node():
         If this node already exists in the graph,
         returns it. Else, returns a new node and
         register it in the all_children set.
+
+        Parameter:
+            state: bitvector representing a state of the maze.
         """
         for child in cls.all_children:
             if child.state == state:
@@ -78,7 +80,12 @@ class Node():
 
 
 def create_root(initial_state):
-    """Create the root of a graph."""
+    """Create the root of a graph.
+
+    Parameter:
+        initial_state: bitvector representing the
+                        initial state of the maze.
+    """
     root = Node(initial_state)
     root.priority = 0
     return root
@@ -91,6 +98,15 @@ def dijkstra_search(root, goal, init, domprob, nb_robots, width, height):
     The priority of each node represent the cost
     (if each action costs 1) to go from the root
     to the node.
+
+    Parameters:
+        root: Node object, the root of the state graph we're
+              searching and building at the same time.
+        goal: bitvector, the state we're searching.
+        init: bitvector, the initial state of the maze.
+        domprob: Domain-Problem object from the pddlpy lib.
+        nb_robots: integer, the number of robots in the maze.
+        width, height: integers, the dimensions of the maze.
     """
     # Priority queue
     pqueue = PriorityQueue()
@@ -144,6 +160,15 @@ def a_star_search(root, goal, init, domprob, nb_robots, width, height):
     The priority of each node represent the cost
     (if each action costs 1) to go from the root
     to the node + the heuristic function value at current node.
+
+    Parameters:
+        root: Node object, the root of the state graph we're
+              searching and building at the same time.
+        goal: bitvector, the state we're searching.
+        init: bitvector, the initial state of the maze.
+        domprob: Domain-Problem object from the pddlpy lib.
+        nb_robots: integer, the number of robots in the maze.
+        width, height: integers, the dimensions of the maze.
     """
     # Priority queue
     pqueue = PriorityQueue()
@@ -195,7 +220,13 @@ def a_star_search(root, goal, init, domprob, nb_robots, width, height):
 
 
 def construct_path(state, meta):
-    """Builds the action list of a solution path."""
+    """Builds the action list of a solution path.
+
+    Parameters:
+        state: bitvector, should be the goal
+        meta: dict{}, containing the move-state actions
+              to extract the solution path.
+    """
     action_list = list()
 
     while True:
@@ -216,13 +247,21 @@ def construct_path(state, meta):
 
 
 def is_goal(node, goal):
-    """Returns true if 'node' is a goal, false otherwise."""
+    """Returns true if 'node' is a goal, false otherwise.
+
+    Parameters:
+        node: Node object
+        goal: bitvector representing the goal we're looking for.
+    """
     return goal & node.state == goal
 
 
 def convert_to_tuple_set(set_of_atom):
     """Converts a set of Atom (from the pddlpy lib)
     to a set of tuple, because we can't compare Atoms.
+
+    Parameters:
+        set_of_atom: a set of Atom objects.
     """
     s = set()
     for atom in set_of_atom:
@@ -231,6 +270,17 @@ def convert_to_tuple_set(set_of_atom):
 
 
 def graphplan_heuristic(state, ground_op_bv, goal, depth, seen_list):
+    """Build a relaxed graphplan. This is used to compute a
+    heuristic for A* search, but right now it just slow down the A* algo.
+
+    Parameters:
+        state: bitvector, the current state from which we'll build graphplan.
+        ground_op_bv: list of sets of GroundOpBV objects.
+        goal: bitvector, the goal we're searching.
+        depth: integer, count the depth of graphplan. This is the
+               value used as a heuristic.
+        seen_list: list of bitvectors, to maintain visited states.
+    """
     length = len(state)
     zero_bv = bitarray(length)
     zero_bv.setall(False)
