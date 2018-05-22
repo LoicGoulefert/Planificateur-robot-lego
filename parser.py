@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 objectives_name = "abcdefghijklmnopqrstuvwxyz"
-CHUNK_SIZE = 2048  # Maximum message size the server can receive
+CHUNK_SIZE = 4096  # Maximum message size the server can receive
 
 
 def goals_to_string(goals):

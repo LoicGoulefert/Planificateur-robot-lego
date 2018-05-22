@@ -269,6 +269,7 @@ def convert_to_tuple_set(set_of_atom):
     return s
 
 
+# Marche pô
 def graphplan_heuristic(state, ground_op_bv, goal, depth, seen_list):
     """Build a relaxed graphplan. This is used to compute a
     heuristic for A* search, but right now it just slow down the A* algo.

@@ -1,9 +1,9 @@
 #! /usr/bin/python3
 
 # Libs
+from bitarray import bitarray
 
 # Others
-from bitarray import bitarray
 
 """This module is an interface between the pddlpy lib
 and a bitvector representation of states.
@@ -41,6 +41,7 @@ class GroundOpBV():
         self.nb_robots = nb_robots
         self.width = width
         self.height = height
+        # C'est la qu'on veut identifier les grounp op
         self.operator_name = instance.operator_name
 
 

@@ -12,7 +12,8 @@ class PriorityQueue:
 
     def insert(self, node):
         """Insert a node into the priority queue,
-        so that it still is ordered after the insertion."""
+        so that it still is ordered after the insertion.
+        """
         # if queue is empty
         if self.size() == 0:
             # add the new node
