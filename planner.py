@@ -113,7 +113,7 @@ def main():
     goal = convert_to_tuple_set(domprob.goals())
     initial_state = convert_to_tuple_set(domprob.initialstate())
     op_list = list(domprob.operators())
-    conf_list = build_config_list(initial_state, op_list, domprob)
+    # conf_list = build_config_list(initial_state, op_list, domprob)
     # print(len(conf_list))
     # print(conf_list)
     # input()
@@ -124,8 +124,8 @@ def main():
     set_robot_list(initial_state)
     init_bv = convert_to_bv(initial_state, nb_robots, width, height)
     goal_bv = convert_to_bv(goal, nb_robots, width, height)
-    # gop_bv = get_ground_operator(
-    #     op_list, domprob, init_bv, nb_robots, width, height)
+
+    conf_list = build_config_list(initial_state, op_list, domprob)
 
     # ***********************************************************
 

@@ -40,11 +40,19 @@ def send_object(obj, IPAdr='127.0.0.2', port=5000):
     s.connect(host)
 
     pickled_obj = pickle.dumps(obj)
-    print('Sending object ({})'.format(len(pickled_obj)))
+    size = len(pickled_obj)
 
+    print('Sending size of pickled obj.')
+    s.send(str(size).encode())
+    answer = s.recv(CHUNK_SIZE).decode()
+    print('Answer : ' + answer)
+
+    print('Sending object ({} bytes)'.format(len(pickled_obj)))
     s.send(pickle.dumps(obj))
     answer = s.recv(CHUNK_SIZE).decode()
     print('Answer : ' + answer)
+
+    s.close()
 
 if __name__ == '__main__':
     pass
