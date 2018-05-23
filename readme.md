@@ -20,7 +20,7 @@ To compile bitarray you must have the python3.5-dev package.
 
 ## Inputs
 
-This simulator is meant to be used with a simulator, connected with it via TCP.
+This planner is meant to be used with a simulator, connected with it via TCP.
 The planner send a list of instructions to the simulator, if it finds a solution to the problem it is asked to solve.
 
 
