@@ -186,9 +186,6 @@ def a_star_search(root, goal, init, domprob, nb_robots, width, height):
     ground_op_bv = get_ground_operator(
         op_list, domprob, init, nb_robots, width, height)
     print("Taille de ground_op : {}".format(len(ground_op_bv[0])))
-    # for opbv in ground_op_bv[0]:
-    #     print(opbv.precondition_pos)
-
     while not pqueue.empty():
         subtree_root = pqueue.dequeue()
         current_priority = subtree_root.priority

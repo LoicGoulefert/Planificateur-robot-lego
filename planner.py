@@ -127,10 +127,6 @@ def main():
     # domain, problem, IPAdr, port = configure_planner()
     maze_pb = int(input('Wich problem file should we use ?'
                         ' (0,1,2,3 ou 4) :'))
-    if maze_pb == 3 or maze_pb == 4:
-        file = 'm1.txt'
-    else:
-        file = 'test.txt'
 
     # Loading PDDL datas
     problem_file = 'pddl/problem-maze{}.pddl'.format(maze_pb)
@@ -163,7 +159,7 @@ def main():
         robots_str = robots_coord_to_string(initial_state)
         path_str = path_to_string(
             path, get_robot_list(initial_state), width*height, width)
-        message = build_message(file, goal_str, "", robots_str, path_str)
+        message = build_message(goal_str, "", robots_str, path_str)
         # Sending path to the simulator
         send_data(message)
         # send_data(message, IPAdr, port)

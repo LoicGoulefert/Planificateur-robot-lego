@@ -67,14 +67,12 @@ def split_into_chunks(message):
     return res
 
 
-def build_message(config_file,
-                  obj_coord,
+def build_message(obj_coord,
                   static_obj_coord,
                   robots_coord,
                   move_list):
     """Builds the message to be sent to the simulator."""
     message = []
-    message.append("#c" + config_file)
     if obj_coord != "":
         message.append(obj_coord)
     if static_obj_coord != "":
