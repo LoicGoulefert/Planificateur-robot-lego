@@ -6,7 +6,6 @@ import pickle
 """The client just sends messages or objects to the server.
 
 Packets identifiers for messages(first 2 char of each message):
-#c -> config file name (must be the same on both sides)
 #1 -> coord. objectives
 #2 -> coord. static objectives
 #3 -> coord. robots
@@ -32,10 +31,10 @@ def send_data(messages, IPAdr='127.0.0.2', port=5000):
     s.connect(host)
 
     for m in messages:
-        print('Sending ({} bytes) : {} '.format(len(m), m))
+        print('[CLIENT]Sending ({} bytes) : {} '.format(len(m), m))
         s.send(m.encode())
         answer = s.recv(CHUNK_SIZE).decode()
-        print('Answer : ' + answer)
+        print('[CLIENT]Answer : ' + answer)
 
     s.close()
 
@@ -56,15 +55,15 @@ def send_object(obj, IPAdr='127.0.0.2', port=5000):
     pickled_obj = pickle.dumps(obj)
     size = len(pickled_obj)
 
-    print('Sending size of pickled obj.')
+    print('[CLIENT]Sending size of pickled obj.')
     s.send(str(size).encode())
     answer = s.recv(CHUNK_SIZE).decode()
-    print('Answer : ' + answer)
+    print('[CLIENT]Answer : ' + answer)
 
-    print('Sending object ({} bytes)'.format(len(pickled_obj)))
+    print('[CLIENT]Sending object ({} bytes)'.format(len(pickled_obj)))
     s.send(pickle.dumps(obj))
     answer = s.recv(CHUNK_SIZE).decode()
-    print('Answer : ' + answer)
+    print('[CLIENT]Answer : ' + answer + '\n')
 
     s.close()
 

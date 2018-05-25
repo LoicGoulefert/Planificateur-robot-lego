@@ -43,6 +43,7 @@ class GroundOpBV():
         self.height = height
         # C'est la qu'on veut identifier les grounp op
         self.operator_name = instance.operator_name
+        self.variable_list = instance.variable_list
 
 
 def set_robot_list(state):

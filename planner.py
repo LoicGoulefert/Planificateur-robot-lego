@@ -119,7 +119,7 @@ def search(f, params, timer=True):
     path = f(*params)
     if timer:
         print('Search duration: {}s'.format(time() - t0))
-    print('Number of nodes explored: {}'.format(len(Node.all_children)))
+    print('Number of nodes explored: {}\n'.format(len(Node.all_children)))
     return path
 
 
@@ -146,6 +146,7 @@ def main():
 
     # Creating and sending config list
     conf_list = build_config_list(initial_state, op_list, domprob)
+    print('[PLANNER]Sending conf list')
     send_object(conf_list)
 
     # Searching for a path
@@ -161,6 +162,9 @@ def main():
             path, get_robot_list(initial_state), width*height, width)
         message = build_message(goal_str, "", robots_str, path_str)
         # Sending path to the simulator
+        print('[PLANNER]Sending path')
+        send_object(path)
+        print('[PLANNER]Sending datas')
         send_data(message)
         # send_data(message, IPAdr, port)
 

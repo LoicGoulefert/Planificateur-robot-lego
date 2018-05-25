@@ -57,7 +57,7 @@ class Node():
                 padding.setall(False)
                 move_details = new_state[:header_size]
                 move_details.extend(padding)
-                action = (inst.operator_name, move_details)
+                action = (inst.operator_name, inst.variable_list, move_details)
                 self.children.append((self.get_node_from_state(new_state),
                                       action))
 

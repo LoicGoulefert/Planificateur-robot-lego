@@ -30,11 +30,12 @@ def robots_coord_to_string(initial_state):
     return res[:-1]  # [:-1] to delete the last ','
 
 
+# ça va dégager ça, on va envoyer un objet pickled en fait
 def path_to_string(path, robot_list, nb_cells, width):
     """Converts the path of bitstring into a string for the client."""
     res = "#4"  # ID of move list
     for action in path:  # bitvector
-        header = action[1][:nb_cells * len(robot_list)]
+        header = action[2][:nb_cells * len(robot_list)]
         for i in range(len(robot_list)):
             res += robot_list[i] + " "
             # Get the coords of 1 robot in the header
