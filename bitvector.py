@@ -5,11 +5,10 @@ from bitarray import bitarray
 
 # Others
 
-"""This module is an interface between the pddlpy lib
-and a bitvector representation of states.
-
-All functions in this module will get informations from
-the pddlpy lib and convert those into sets of bitvectors.
+"""Convert states into bitvectors.
+Convert ground_op into GroundOpBV objects, meaning
+it converts all preconditions and effects of a ground_op
+into bitvectors.
 """
 
 # Store the robots in alphabetical order
@@ -83,6 +82,7 @@ def get_index_of_cell(cell, width):
     return x*width + y
 
 
+# A modifier
 def convert_to_bv(state, nb_robots, width, height):
     """Converts a PDDL state into a bit-vector
 

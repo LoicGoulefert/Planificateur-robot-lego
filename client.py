@@ -3,13 +3,16 @@
 # Libs
 from socket import socket, AF_INET, SOCK_STREAM
 import pickle
-"""The client just sends messages or objects to the server.
+
+# Others
+
+"""The client sends messages or objects to the server.
 
 Packets identifiers for messages(first 2 char of each message):
 #1 -> coord. objectives
 #2 -> coord. static objectives
 #3 -> coord. robots
-#4 -> move list
+#4 -> move list => Will be replaced
 #0 -> End of communication
 """
 

@@ -1,5 +1,13 @@
 #!/usr/bin/python3
 
+# Libs
+
+# Others
+
+"""This module converts various states to strings,
+in order to be sent to the simulator.
+"""
+
 objectives_name = "abcdefghijklmnopqrstuvwxyz"
 CHUNK_SIZE = 4096  # Maximum message size the server can receive
 
@@ -7,6 +15,10 @@ CHUNK_SIZE = 4096  # Maximum message size the server can receive
 def goals_to_string(goals):
     """Converts the goals into a string
     for the client.
+
+    Parameters:
+        goals: set of tuple, pddl-like representation of a goal
+               (ex : ('at', 'X', 'c-0-0'))
     """
     i = 0  # index for objectives name
     res = "#1"
@@ -19,8 +31,13 @@ def goals_to_string(goals):
 
 
 def robots_coord_to_string(initial_state):
-    """Converts the robots coord into a string for the client."""
-    res = "#3"
+    """Converts the robots coord into a string for the client.
+
+    Parameters:
+        initial_state: set of tuple, pddl-like representation
+                       (ex : ('at', 'X', 'c-0-0'))
+    """
+    res = "#3"  # ID of robots' coords
     for state in initial_state:
         if state[0] == 'at':
             res += state[1] + " "
@@ -54,6 +71,9 @@ def path_to_string(path, robot_list, nb_cells, width):
 def split_into_chunks(message):
     """Splits a string bigger than CHUNK_SIZE
     into smaller chunks of CHUNK_SIZE length maximum.
+
+    Parameters:
+        message: string
     """
     packet_id = message[:2]
     res = []
@@ -72,7 +92,14 @@ def build_message(obj_coord,
                   static_obj_coord,
                   robots_coord,
                   move_list):
-    """Builds the message to be sent to the simulator."""
+    """Builds the message to be sent to the simulator.
+
+    Parameters:
+        obj_coord: string
+        static_obj_coord: string
+        robots_coord: string
+        move_list: string
+    """
     message = []
     if obj_coord != "":
         message.append(obj_coord)

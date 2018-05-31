@@ -13,11 +13,17 @@ from parser import robots_coord_to_string, build_message
 from bitvector import convert_to_bv, set_robot_list
 
 """How it works :
-1) Config of pddl files + IP, port
-2) Get info from pddl files (domprob, init_state...)
+1) Config of pddl files + IP, port (the user can choose it,
+default is 127.0.0.2:5000)
+
+2) Get info from pddl files (domprob, init_state...) using pddlpy
+
 3) Build and send conf_list to simulator
-4) Convert these infos into bitvectors
-5) Search for a solution in state graph
+
+4) Convert init_state, goal... into bitvectors
+
+5) Search for a solution in state graph, using Dijkstra
+
 6) Parse solution to send it to the simulator
 """
 
@@ -37,7 +43,7 @@ def get_nb_robots(initial_state):
     This function is specific to maze planning problems.
 
     Parameters:
-        initial_state: set of tuples ('at', 'X', 'c-0-0')
+        initial_state: set of tuples. ex: {('at', 'X', 'c-0-0')}
     """
     res = 0
     for s in initial_state:
@@ -51,7 +57,7 @@ def get_robot_list(initial_state):
     sorted alphabetically.
 
     Parameters:
-        initial_state: set of tuples ('at', 'X', 'c-0-0')
+        initial_state: set of tuples. ex: {('at', 'X', 'c-0-0')}
     """
     res = list()
     for s in initial_state:
@@ -78,6 +84,7 @@ def build_config_list(initial_state, op_list, domprob):
     return list(res)
 
 
+# Soon obsolete
 def get_width_and_height(problem_file):
     """Returns the width and height of the maze.
     This function is specific to maze planning problems.
@@ -112,7 +119,7 @@ def search(f, params, timer=True):
     Returns a path if a solution is found, else None.
 
     Parameters:
-        f : search function name
+        f : search function name (dijkstra or A*)
         params: a tuple of parameters
     """
     t0 = time()

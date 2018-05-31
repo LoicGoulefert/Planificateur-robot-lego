@@ -18,6 +18,8 @@ class Node():
     The class variable all_children stores the different states
     (e.g. the different nodes) that were seen during
     the creation of a graph.
+
+    The states are bitvectors.
     """
     all_children = set()
 
@@ -41,7 +43,7 @@ class Node():
         created.
 
         Parameter:
-            ground_op_set: set of all possible actions per operator.
+            ground_op_set: set GroundOpBV objects.
         """
         length = len(self.state)
         zero_bv = bitarray(length)
@@ -270,6 +272,8 @@ def convert_to_tuple_set(set_of_atom):
 def graphplan_heuristic(state, ground_op_bv, goal, depth, seen_list):
     """Build a relaxed graphplan. This is used to compute a
     heuristic for A* search, but right now it just slow down the A* algo.
+
+    It takes the first move availible => bug
 
     Parameters:
         state: bitvector, the current state from which we'll build graphplan.
